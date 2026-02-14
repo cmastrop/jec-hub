@@ -1,8 +1,9 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Music,
   ListMusic,
@@ -10,8 +11,10 @@ import {
   Upload,
   Users,
   Settings,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
+import { createClient } from "@/lib/supabase/client";
 
 const navLinks = [
   { href: "/canciones", label: "Canciones", icon: Music },
@@ -24,6 +27,24 @@ const navLinks = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setUserName(user.user_metadata?.full_name || user.email || "");
+      }
+    });
+  }, []);
+
+  async function handleLogout() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  }
 
   return (
     <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 border-r border-gray-200 bg-white">
@@ -62,6 +83,22 @@ export function Sidebar() {
           );
         })}
       </nav>
+
+      {/* User section at bottom */}
+      <div className="border-t border-gray-200 p-3">
+        {userName && (
+          <p className="px-3 py-1 text-sm font-medium text-gray-700 truncate">
+            {userName}
+          </p>
+        )}
+        <button
+          onClick={handleLogout}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors"
+        >
+          <LogOut className="h-5 w-5" />
+          Cerrar Sesión
+        </button>
+      </div>
     </aside>
   );
 }
