@@ -35,9 +35,9 @@ export async function middleware(request: NextRequest) {
 
   // Redirect unauthenticated users to login (except for public routes)
   const publicRoutes = ["/login", "/registro", "/"];
-  const isPublicRoute = publicRoutes.some(
-    (route) => request.nextUrl.pathname === route
-  );
+  const isPublicRoute =
+    publicRoutes.some((route) => request.nextUrl.pathname === route) ||
+    request.nextUrl.pathname.startsWith("/api");
 
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone();
