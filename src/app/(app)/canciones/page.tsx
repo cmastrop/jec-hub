@@ -1,17 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Search, Music } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils/cn";
+import Link from "next/link";
+import type { Song } from "@/lib/types/database";
 
-const keys = ["C", "D", "E", "F", "G", "A"];
+const keys = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"];
 
 export default function CancionesPage() {
   const [search, setSearch] = useState("");
   const [activeKey, setActiveKey] = useState<string | null>(null);
+  const [songs, setSongs] = useState<Song[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [showDrafts, setShowDrafts] = useState(false);
+
+  useEffect(() => {
+    const timeout = setTimeout(async () => {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (search) params.set("search", search);
+      if (activeKey) params.set("key", activeKey);
+      params.set("status", showDrafts ? "all" : "published");
+      params.set("limit", "100");
+
+      try {
+        const res = await fetch(`/api/songs?${params}`);
+        const data = await res.json();
+        setSongs(data.songs || []);
+        setTotal(data.total || 0);
+      } catch {
+        // ignore
+      }
+      setLoading(false);
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [search, activeKey, showDrafts]);
 
   return (
     <div className="space-y-6">
@@ -19,11 +46,29 @@ export default function CancionesPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-2xl font-bold text-foreground">
           Biblioteca de Canciones
+          {total > 0 && (
+            <span className="text-base font-normal text-gray-400 ml-2">
+              ({total})
+            </span>
+          )}
         </h2>
-        <Button>
-          <Plus className="h-4 w-4" />
-          Nueva Canción
-        </Button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShowDrafts(!showDrafts)}
+            className={cn(
+              "px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+              showDrafts
+                ? "bg-amber-100 text-amber-700"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+            )}
+          >
+            {showDrafts ? "Mostrando todas" : "Mostrar borradores"}
+          </button>
+          <Button>
+            <Plus className="h-4 w-4" />
+            Nueva Canción
+          </Button>
+        </div>
       </div>
 
       {/* Search */}
@@ -59,18 +104,58 @@ export default function CancionesPage() {
         ))}
       </div>
 
-      {/* Empty state */}
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
-          <Music className="h-8 w-8 text-primary" />
+      {/* Song list */}
+      {loading ? (
+        <div className="flex justify-center py-20">
+          <div className="h-8 w-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
         </div>
-        <h3 className="text-lg font-semibold text-foreground mb-2">
-          No hay canciones todavía
-        </h3>
-        <p className="max-w-sm text-sm text-gray-500">
-          No hay canciones todavía. Importa desde Dropbox o crea una nueva.
-        </p>
-      </div>
+      ) : songs.length > 0 ? (
+        <div className="grid gap-3">
+          {songs.map((song) => (
+            <Link
+              key={song.id}
+              href={`/canciones/${song.id}`}
+              className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4 hover:border-primary/50 hover:shadow-sm transition-all"
+            >
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-foreground truncate">
+                    {song.title}
+                  </h3>
+                  {song.status === "draft" && (
+                    <span className="shrink-0 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
+                      Borrador
+                    </span>
+                  )}
+                </div>
+                {song.artist && (
+                  <p className="text-sm text-gray-500 truncate">{song.artist}</p>
+                )}
+              </div>
+              <div className="flex items-center gap-3 ml-4 shrink-0">
+                <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary text-sm font-bold">
+                  {song.original_key}
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
+            <Music className="h-8 w-8 text-primary" />
+          </div>
+          <h3 className="text-lg font-semibold text-foreground mb-2">
+            No hay canciones todavía
+          </h3>
+          <p className="max-w-sm text-sm text-gray-500">
+            Importá desde Dropbox o creá una nueva canción.
+          </p>
+          <Link href="/importar">
+            <Button className="mt-4">Importar Canciones</Button>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

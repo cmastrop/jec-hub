@@ -1,75 +1,109 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useParams } from "next/navigation";
 import { ChordChart } from "@/components/song/chord-chart";
 import { TransposeControls } from "@/components/song/transpose-controls";
 import { FontSizeControls } from "@/components/song/font-size-controls";
 import { NotationToggle } from "@/components/song/notation-toggle";
 import { getKeyFromSemitoneOffset } from "@/lib/chordpro/transpose";
 import type { NotationMode } from "@/lib/chordpro/types";
-import { ArrowLeft } from "lucide-react";
+import type { Song } from "@/lib/types/database";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 
-const DEMO_CHORDPRO = `{title: Grande Es Tu Fidelidad}
-{artist: Himno Clasico}
-{key: G}
-{tempo: 72}
-{time: 4/4}
-
-{start_of_verse: Verso 1}
-[G]Grande es tu fi[C]deli[G]dad, oh [Em]Dios mi [D]Padre
-[G]No hay som[B7]bra de va[Em]riacion en [A7]Ti [D]
-[G]Tu com[C]pasion no [Bm]cambia [Em]
-[Am]Grande es [D]tu [G]fidelidad
-{end_of_verse}
-
-{start_of_chorus: Coro}
-[G]Grande es tu fi[C]deli[G]dad
-[G]Grande es tu fi[C]deli[G]dad
-[Em]Cada ma[Bm]nana las [C]misericor[D]dias
-[Em]Nuevas [C]son, [D]grande es tu [G]fideli[C]dad [G]
-{end_of_chorus}
-
-{start_of_bridge: Puente}
-[C]Tu compasion no se a[G]gota
-[Am]Nueva es cada [D]manana
-{end_of_bridge}`;
-
-const ORIGINAL_KEY = "G";
-
 export default function SongDetailPage() {
+  const params = useParams();
+  const [song, setSong] = useState<Song | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [semitones, setSemitones] = useState(0);
-  const [targetKey, setTargetKey] = useState(ORIGINAL_KEY);
+  const [targetKey, setTargetKey] = useState("");
   const [fontSize, setFontSize] = useState(18);
   const [notation, setNotation] = useState<NotationMode>("letter");
 
+  useEffect(() => {
+    async function loadSong() {
+      try {
+        const res = await fetch(`/api/songs/${params.id}`);
+        if (!res.ok) {
+          setError("Canción no encontrada");
+          setLoading(false);
+          return;
+        }
+        const data = await res.json();
+        setSong(data);
+        setTargetKey(data.original_key || "C");
+      } catch {
+        setError("Error al cargar la canción");
+      }
+      setLoading(false);
+    }
+    loadSong();
+  }, [params.id]);
+
+  const originalKey = song?.original_key || "C";
   const currentKey = useMemo(
-    () => getKeyFromSemitoneOffset(ORIGINAL_KEY, semitones),
-    [semitones]
+    () => getKeyFromSemitoneOffset(originalKey, semitones),
+    [originalKey, semitones]
   );
 
-  const handleTransposeChange = (newSemitones: number, newTargetKey: string) => {
+  const handleTransposeChange = (
+    newSemitones: number,
+    newTargetKey: string
+  ) => {
     setSemitones(newSemitones);
     setTargetKey(newTargetKey);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+      </div>
+    );
+  }
+
+  if (error || !song) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+        <h2 className="text-xl font-semibold text-gray-700 mb-2">
+          {error || "Canción no encontrada"}
+        </h2>
+        <Link
+          href="/canciones"
+          className="text-primary hover:underline text-sm"
+        >
+          Volver a canciones
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
       {/* Top navigation */}
       <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 py-3">
-          <Link
-            href="/canciones"
-            className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-foreground transition-colors mb-3"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Volver a canciones
-          </Link>
+          <div className="flex items-center justify-between mb-3">
+            <Link
+              href="/canciones"
+              className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Volver a canciones
+            </Link>
+            {song.status === "draft" && (
+              <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">
+                Borrador
+              </span>
+            )}
+          </div>
 
           {/* Controls bar */}
           <div className="flex flex-wrap items-center gap-4">
             <TransposeControls
-              originalKey={ORIGINAL_KEY}
+              originalKey={originalKey}
               currentKey={currentKey}
               onChange={handleTransposeChange}
               notation={notation}
@@ -85,7 +119,7 @@ export default function SongDetailPage() {
       {/* Chord chart content */}
       <main className="max-w-4xl mx-auto px-4 py-8">
         <ChordChart
-          content={DEMO_CHORDPRO}
+          content={song.chordpro_content}
           notation={notation}
           transpose={semitones}
           targetKey={targetKey}

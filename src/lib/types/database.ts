@@ -1,0 +1,57 @@
+export interface Song {
+  id: string;
+  title: string;
+  artist: string | null;
+  original_key: string;
+  tempo: number | null;
+  time_signature: string | null;
+  chordpro_content: string;
+  language: string;
+  tags: string[];
+  notes: string | null;
+  source_type: "manual" | "import_image" | "import_pdf" | "import_dropbox";
+  original_file_url: string | null;
+  status: "draft" | "published" | "archived";
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ImportJob {
+  id: string;
+  status: "pending" | "processing" | "completed" | "failed" | "paused";
+  source: "dropbox" | "upload";
+  total_files: number;
+  processed_files: number;
+  failed_files: number;
+  error_log: Array<{ file: string; error: string; timestamp: string }>;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ImportItem {
+  id: string;
+  job_id: string;
+  original_filename: string;
+  file_type: string | null;
+  storage_path: string | null;
+  status: "pending" | "processing" | "completed" | "failed" | "skipped" | "review";
+  gemini_raw_response: string | null;
+  extracted_chordpro: string | null;
+  song_id: string | null;
+  error_message: string | null;
+  created_at: string;
+}
+
+export interface MigratedFile {
+  id: string;
+  dropbox_path: string;
+  storage_path: string | null;
+  file_type: string | null;
+  file_size: number;
+  dropbox_folder: string | null;
+  status: "pending" | "downloading" | "downloaded" | "processed" | "error";
+  error_message: string | null;
+  created_at: string;
+}
