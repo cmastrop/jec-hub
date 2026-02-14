@@ -1,7 +1,7 @@
 import { Dropbox } from "dropbox";
 
 export function getDropboxClient(accessToken: string): Dropbox {
-  return new Dropbox({ accessToken });
+  return new Dropbox({ accessToken, fetch: globalThis.fetch.bind(globalThis) });
 }
 
 export interface DropboxFileEntry {
