@@ -1,26 +1,68 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8f9fa;
+  --foreground: #1a1a2e;
+  --primary: #2B5EA7;
+  --primary-light: #3d7dd4;
+  --primary-dark: #1e4a85;
+  --gold: #B8960C;
+  --gold-light: #d4ad0e;
+  --gold-dark: #96790a;
+  --chord-color: #2B5EA7;
+  --section-verse: #2B5EA7;
+  --section-chorus: #B8960C;
+  --section-bridge: #7c3aed;
+  --section-precoro: #059669;
+  --chord-font-size: 1rem;
+  --lyrics-font-size: 1.125rem;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-primary-dark: var(--primary-dark);
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
+  --color-gold-dark: var(--gold-dark);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0f172a;
+    --foreground: #e2e8f0;
+    --chord-color: #60a5fa;
+    --section-verse: #60a5fa;
+    --section-chorus: #fbbf24;
+    --section-bridge: #a78bfa;
+    --section-precoro: #34d399;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
+
+/* Chord chart styles */
+.chord-chart {
+  font-size: var(--lyrics-font-size);
+  line-height: 1.8;
+}
+
+.chord-chart .chord {
+  font-size: var(--chord-font-size);
+  font-weight: 700;
+  color: var(--chord-color);
+  font-family: var(--font-mono), monospace;
+}
+
+.chord-chart .section-verse { border-left-color: var(--section-verse); }
+.chord-chart .section-chorus { border-left-color: var(--section-chorus); }
+.chord-chart .section-bridge { border-left-color: var(--section-bridge); }
+.chord-chart .section-precoro { border-left-color: var(--section-precoro); }
