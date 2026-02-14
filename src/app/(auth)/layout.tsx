@@ -6,7 +6,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary via-primary-dark to-primary-dark p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary via-primary-dark to-primary-dark p-4" data-theme="light">
       <div className="flex w-full max-w-md flex-col items-center gap-8">
         {/* Logo */}
         <div className="flex flex-col items-center gap-3">
@@ -21,7 +21,9 @@ export default function AuthLayout({
         </div>
 
         {/* Card content */}
-        {children}
+        <div className="w-full *:!bg-white *:!shadow-2xl *:!border-white/20">
+          {children}
+        </div>
       </div>
     </div>
   );
