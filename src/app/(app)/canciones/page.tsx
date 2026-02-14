@@ -1,21 +1,24 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Search, Music } from "lucide-react";
+import { Plus, Search, Music, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils/cn";
+import { useUser } from "@/hooks/use-user";
 import Link from "next/link";
 import type { Song } from "@/lib/types/database";
 
 const keys = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"];
 
 export default function CancionesPage() {
+  const { isAdmin } = useUser();
   const [search, setSearch] = useState("");
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [songs, setSongs] = useState<Song[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showDrafts, setShowDrafts] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     const timeout = setTimeout(async () => {
@@ -24,7 +27,7 @@ export default function CancionesPage() {
       if (search) params.set("search", search);
       if (activeKey) params.set("key", activeKey);
       params.set("status", showDrafts ? "all" : "published");
-      params.set("limit", "100");
+      params.set("limit", "200");
 
       try {
         const res = await fetch(`/api/songs?${params}`);
@@ -39,6 +42,23 @@ export default function CancionesPage() {
 
     return () => clearTimeout(timeout);
   }, [search, activeKey, showDrafts]);
+
+  async function handleDelete(e: React.MouseEvent, songId: string) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!confirm("Eliminar esta cancion?")) return;
+    setDeletingId(songId);
+    try {
+      const res = await fetch(`/api/songs/${songId}`, { method: "DELETE" });
+      if (res.ok) {
+        setSongs((prev) => prev.filter((s) => s.id !== songId));
+        setTotal((prev) => prev - 1);
+      }
+    } catch {
+      // ignore
+    }
+    setDeletingId(null);
+  }
 
   return (
     <div className="space-y-6">
@@ -64,10 +84,12 @@ export default function CancionesPage() {
           >
             {showDrafts ? "Mostrando todas" : "Mostrar borradores"}
           </button>
-          <Button>
-            <Plus className="h-4 w-4" />
-            Nueva Canción
-          </Button>
+          {isAdmin && (
+            <Button>
+              <Plus className="h-4 w-4" />
+              Nueva Cancion
+            </Button>
+          )}
         </div>
       </div>
 
@@ -112,32 +134,43 @@ export default function CancionesPage() {
       ) : songs.length > 0 ? (
         <div className="grid gap-3">
           {songs.map((song) => (
-            <Link
-              key={song.id}
-              href={`/canciones/${song.id}`}
-              className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4 hover:border-primary/50 hover:shadow-sm transition-all"
-            >
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-foreground truncate">
-                    {song.title}
-                  </h3>
-                  {song.status === "draft" && (
-                    <span className="shrink-0 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
-                      Borrador
-                    </span>
+            <div key={song.id} className="flex items-center gap-2">
+              <Link
+                href={`/canciones/${song.id}`}
+                className="flex-1 flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4 hover:border-primary/50 hover:shadow-sm transition-all"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-foreground truncate">
+                      {song.title}
+                    </h3>
+                    {song.status === "draft" && (
+                      <span className="shrink-0 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
+                        Borrador
+                      </span>
+                    )}
+                  </div>
+                  {song.artist && (
+                    <p className="text-sm text-gray-500 truncate">{song.artist}</p>
                   )}
                 </div>
-                {song.artist && (
-                  <p className="text-sm text-gray-500 truncate">{song.artist}</p>
-                )}
-              </div>
-              <div className="flex items-center gap-3 ml-4 shrink-0">
-                <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary text-sm font-bold">
-                  {song.original_key}
-                </span>
-              </div>
-            </Link>
+                <div className="flex items-center gap-3 ml-4 shrink-0">
+                  <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 text-primary text-sm font-bold">
+                    {song.original_key}
+                  </span>
+                </div>
+              </Link>
+              {isAdmin && (
+                <button
+                  onClick={(e) => handleDelete(e, song.id)}
+                  disabled={deletingId === song.id}
+                  className="shrink-0 p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
+                  title="Eliminar cancion"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+            </div>
           ))}
         </div>
       ) : (

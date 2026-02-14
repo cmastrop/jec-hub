@@ -44,6 +44,18 @@ export interface ImportItem {
   created_at: string;
 }
 
+export interface Profile {
+  id: string;
+  email: string;
+  full_name: string | null;
+  role: "admin" | "member";
+  avatar_url: string | null;
+  notation_preference: "letter" | "solfege";
+  font_size_preference: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface MigratedFile {
   id: string;
   dropbox_path: string;

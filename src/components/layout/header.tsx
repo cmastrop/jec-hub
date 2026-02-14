@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, User, LogOut } from "lucide-react";
+import { Menu, User, LogOut, Shield } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/hooks/use-user";
 
 const pageTitles: Record<string, string> = {
   "/canciones": "Canciones",
@@ -27,6 +28,7 @@ export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const title = getPageTitle(pathname);
+  const { isAdmin } = useUser();
   const [userName, setUserName] = useState("");
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -94,6 +96,12 @@ export function Header() {
             {userName && (
               <div className="px-4 py-2 border-b border-gray-100">
                 <p className="text-sm font-medium text-gray-900 truncate">{userName}</p>
+                {isAdmin && (
+                  <p className="text-xs text-primary flex items-center gap-1 mt-0.5">
+                    <Shield className="w-3 h-3" />
+                    Administrador
+                  </p>
+                )}
               </div>
             )}
             <button
