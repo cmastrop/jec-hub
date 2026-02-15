@@ -8,6 +8,11 @@ type UserProfile = Pick<Profile, "id" | "email" | "full_name" | "role">;
 let cachedProfile: UserProfile | null = null;
 let fetchPromise: Promise<UserProfile | null> | null = null;
 
+export function clearUserCache() {
+  cachedProfile = null;
+  fetchPromise = null;
+}
+
 async function fetchProfile(): Promise<UserProfile | null> {
   try {
     const res = await fetch("/api/me");

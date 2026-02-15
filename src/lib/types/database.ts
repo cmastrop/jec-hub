@@ -56,6 +56,30 @@ export interface Profile {
   updated_at: string;
 }
 
+export interface Setlist {
+  id: string;
+  title: string;
+  service_type: "domingo" | "miercoles" | "jovenes" | "oracion" | "especial" | "otro";
+  service_date: string | null;
+  notes: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+  song_count?: number;
+}
+
+export interface SetlistSong {
+  id: string;
+  setlist_id: string;
+  song_id: string;
+  position: number;
+  transpose_key: string | null;
+  capo: number;
+  notes: string | null;
+  created_at: string;
+  song?: Pick<Song, "id" | "title" | "artist" | "original_key">;
+}
+
 export interface MigratedFile {
   id: string;
   dropbox_path: string;
