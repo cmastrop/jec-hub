@@ -282,6 +282,28 @@ Permisos:
 - Authenticated en `/login` o `/registro` → redirige a `/canciones`
 - Matcher excluye: `_next/static`, `_next/image`, `favicon.ico`, `logo.webp`, imagenes
 
+## Migracion Dropbox
+
+### Estado Actual
+- **Primera corrida completada** (parcial — token expiro a ~56%)
+- Canciones creadas: **985 nuevas**
+- Ya existentes (saltadas): 1,000
+- **Total canciones en DB: ~1,985**
+- Fallos: 1,505 (1,460 por token expirado, 11 Claude API, 34 desconocidos)
+
+### Pendiente: Segunda Corrida
+- Faltan ~1,500 archivos por procesar (los que fallaron por token expirado)
+- **Paso 1**: Renovar token de Dropbox (el actual expiro durante la migracion)
+- **Paso 2**: Correr `npx tsx scripts/migrate.ts` — el script saltea canciones ya existentes
+- **Paso 3**: Solo procesara los archivos que no se pudieron descargar la primera vez
+- Los errores de Claude API (11) son por mime type incorrecto en algunos archivos corruptos
+
+### Script
+- Archivo: `scripts/migrate.ts`
+- Usa Claude API (premium) para OCR masivo
+- Rate limiter integrado para no exceder limites de API
+- Registra archivos procesados en tabla `migrated_files` para evitar reprocesamiento
+
 ## Convenios
 
 - Idioma UI: Espanol
