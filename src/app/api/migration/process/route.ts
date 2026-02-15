@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { extractChordProFromImage } from "@/lib/gemini/extract";
+import { getAIExtractor } from "@/lib/ai";
 import { parseChordPro } from "@/lib/chordpro/parser";
 import { RateLimiter } from "@/lib/migration/utils";
 
@@ -79,8 +79,9 @@ export async function POST(request: Request) {
 
         const buffer = Buffer.from(await fileData.arrayBuffer());
 
-        // Extract with Gemini
-        const result = await extractChordProFromImage(
+        // Extract with AI
+        const extractor = getAIExtractor("gemini");
+        const result = await extractor.extractChordPro(
           buffer,
           item.file_type || "image/jpeg"
         );

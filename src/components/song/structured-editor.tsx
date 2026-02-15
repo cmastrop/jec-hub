@@ -14,7 +14,11 @@ import {
   EyeOff,
   Save,
   GripVertical,
+  Music,
+  Type,
 } from "lucide-react";
+import { ChordPositionEditor } from "./chord-position-editor";
+import type { Line } from "@/lib/chordpro/types";
 
 const SECTION_TYPES: { value: SectionType; label: string }[] = [
   { value: "intro", label: "Intro" },
@@ -117,6 +121,7 @@ export function StructuredEditor({
   const [showPreview, setShowPreview] = useState(false);
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [editingLabel, setEditingLabel] = useState<number | null>(null);
+  const [chordEditMode, setChordEditMode] = useState<"text" | "visual">("text");
 
   const song = useMemo(() => parseChordPro(content), [content]);
 
@@ -217,6 +222,23 @@ export function StructuredEditor({
     [updateSong]
   );
 
+  const updateSectionLine = useCallback(
+    (sectionIndex: number, lineIndex: number, newLine: Line) => {
+      updateSong((s) => ({
+        ...s,
+        sections: s.sections.map((sec, si) =>
+          si === sectionIndex
+            ? {
+                ...sec,
+                lines: sec.lines.map((l, li) => (li === lineIndex ? newLine : l)),
+              }
+            : sec
+        ),
+      }));
+    },
+    [updateSong]
+  );
+
   return (
     <div className="space-y-4">
       {/* Toolbar */}
@@ -232,6 +254,21 @@ export function StructuredEditor({
               <Eye className="w-4 h-4" />
             )}
             {showPreview ? "Ocultar vista previa" : "Vista previa"}
+          </button>
+          <button
+            onClick={() => setChordEditMode(chordEditMode === "text" ? "visual" : "text")}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg transition-colors ${
+              chordEditMode === "visual"
+                ? "bg-primary/10 text-primary"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
+          >
+            {chordEditMode === "visual" ? (
+              <Type className="w-4 h-4" />
+            ) : (
+              <Music className="w-4 h-4" />
+            )}
+            {chordEditMode === "visual" ? "Modo Texto" : "Modo Acordes"}
           </button>
         </div>
         <div className="flex items-center gap-2">
@@ -391,17 +428,29 @@ export function StructuredEditor({
                 </button>
               </div>
 
-              {/* Section content (ChordPro textarea) */}
-              <textarea
-                value={sectionToRawLines(section)}
-                onChange={(e) => updateSectionContent(idx, e.target.value)}
-                rows={Math.max(
-                  2,
-                  sectionToRawLines(section).split("\n").length + 1
-                )}
-                className="w-full font-mono text-sm p-3 bg-white/50 border-0 focus:outline-none focus:ring-0 resize-none"
-                placeholder="[G]Letra con [Am]acordes..."
-              />
+              {/* Section content */}
+              {chordEditMode === "visual" ? (
+                <div className="p-2 space-y-0.5 bg-white/50">
+                  {section.lines.map((lineItem, lineIdx) => (
+                    <ChordPositionEditor
+                      key={lineIdx}
+                      line={lineItem}
+                      onChange={(newLine) => updateSectionLine(idx, lineIdx, newLine)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <textarea
+                  value={sectionToRawLines(section)}
+                  onChange={(e) => updateSectionContent(idx, e.target.value)}
+                  rows={Math.max(
+                    2,
+                    sectionToRawLines(section).split("\n").length + 1
+                  )}
+                  className="w-full font-mono text-sm p-3 bg-white/50 border-0 focus:outline-none focus:ring-0 resize-none"
+                  placeholder="[G]Letra con [Am]acordes..."
+                />
+              )}
             </div>
           ))}
 
