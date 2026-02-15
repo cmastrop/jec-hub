@@ -9,14 +9,16 @@ App web para la iglesia "Jesus Es El Camino" (JEC). Gestiona canciones con chord
 - **Backend**: Next.js API Routes + Supabase (PostgreSQL, Auth, Storage)
 - **AI**: Gemini (gratis, default) + Claude API (premium, backup) para OCR de chord charts
 - **Drag & Drop**: @dnd-kit (reordenamiento de canciones en setlists)
-- **Deploy**: Vercel (https://jec-hub.vercel.app)
+- **Deploy**: Vercel (https://jec-hub.vercel.app) — deploy manual con `npx vercel --prod`
 - **Repo**: https://github.com/cmastrop/jec-hub
 
 ## Estructura del Proyecto
 
 ```
 src/
+  middleware.ts           # Auth middleware (rutas publicas, redirects)
   app/
+    page.tsx              # Landing page (split-screen, features, CTAs)
     (auth)/              # Layout de autenticacion (login/registro)
       layout.tsx         # Split layout con imagen de adoracion + form
       login/page.tsx     # Pagina de login
@@ -250,9 +252,35 @@ Permisos:
 - Soporta: JPG, PNG, WebP, PDF (max 10MB)
 - Crea borrador, redirect al editor
 
+### Landing Page
+- Diseno split-screen igual que login (imagen de adoracion a la izquierda)
+- Panel derecho: logo, grid de features (Canciones, Programas, Calendario, Equipo), CTAs
+- Botones: "Iniciar Sesion" (primary) + "Crear Cuenta" (outline)
+- Mobile: hero image como banner superior, contenido stacked
+- Versiculo: "Cantad a Jehova cantico nuevo" (Salmos 96:1)
+
 ### Pagina de Login
 - Diseno split-screen con imagen de adoracion
 - Responsive (stacked en mobile, side-by-side en desktop)
+
+## Deploy
+
+- **Plataforma**: Vercel (proyecto `jec-hub` en team `cmastrops-projects`)
+- **URL produccion**: https://jec-hub.vercel.app
+- **Auto-deploy NO esta configurado** (no hay webhook de GitHub → Vercel)
+- **Deploy manual**: `npx vercel --prod` desde la raiz del proyecto (CLI autenticado como `cmastrop`)
+- **Force deploy** (sin cache): `npx vercel --prod --force`
+- Para activar auto-deploy: conectar repo en Vercel Dashboard > Settings > Git > GitHub
+- El build usa Turbopack (`next build`), ~30s en Vercel
+- Variables de entorno configuradas en Vercel Dashboard
+
+## Middleware (Auth)
+
+- Archivo: `src/middleware.ts`
+- Rutas publicas (sin auth): `/`, `/login`, `/registro`, `/api/*`
+- Unauthenticated → redirige a `/login`
+- Authenticated en `/login` o `/registro` → redirige a `/canciones`
+- Matcher excluye: `_next/static`, `_next/image`, `favicon.ico`, `logo.webp`, imagenes
 
 ## Convenios
 
