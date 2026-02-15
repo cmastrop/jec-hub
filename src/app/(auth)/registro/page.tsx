@@ -4,16 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { UserPlus, CheckCircle } from "lucide-react";
 
 export default function RegistroPage() {
   const [fullName, setFullName] = useState("");
@@ -31,13 +22,13 @@ export default function RegistroPage() {
     setLoading(true);
 
     if (password !== confirmPassword) {
-      setError("Las contraseñas no coinciden");
+      setError("Las contrasenas no coinciden");
       setLoading(false);
       return;
     }
 
     if (password.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres");
+      setError("La contrasena debe tener al menos 6 caracteres");
       setLoading(false);
       return;
     }
@@ -62,7 +53,6 @@ export default function RegistroPage() {
     setSuccess(true);
     setLoading(false);
 
-    // Auto-login after registration
     setTimeout(() => {
       router.push("/canciones");
       router.refresh();
@@ -71,83 +61,115 @@ export default function RegistroPage() {
 
   if (success) {
     return (
-      <Card className="w-full">
-        <CardContent className="pt-6 text-center">
-          <div className="text-4xl mb-4">✓</div>
-          <h3 className="text-lg font-semibold text-green-700 mb-2">
-            Cuenta creada exitosamente
+      <div className="w-full">
+        <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-8 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
+            <CheckCircle className="w-8 h-8 text-green-600" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">
+            Cuenta creada
           </h3>
           <p className="text-sm text-gray-500">
-            Redirigiendo a la aplicación...
+            Redirigiendo a la aplicacion...
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card className="w-full">
-      <CardHeader className="text-center">
-        <CardTitle className="text-xl">Crear Cuenta</CardTitle>
-        <CardDescription>
-          Registrate para acceder al ministerio de música
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form className="space-y-4" onSubmit={handleRegister}>
+    <div className="w-full">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
+          <UserPlus className="w-6 h-6 text-primary" />
+        </div>
+        <h2 className="text-2xl font-bold text-gray-900">Crear Cuenta</h2>
+        <p className="text-gray-500 mt-1">
+          Registrate para acceder al ministerio de musica
+        </p>
+      </div>
+
+      {/* Form */}
+      <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-6 sm:p-8">
+        <form className="space-y-5" onSubmit={handleRegister}>
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3">
+            <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl p-3.5">
               {error}
             </div>
           )}
-          <Input
-            label="Nombre completo"
-            type="text"
-            placeholder="Tu nombre"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            required
-          />
-          <Input
-            label="Correo electrónico"
-            type="email"
-            placeholder="tu@correo.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <Input
-            label="Contraseña"
-            type="password"
-            placeholder="Mínimo 6 caracteres"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <Input
-            label="Confirmar contraseña"
-            type="password"
-            placeholder="Repetí la contraseña"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Creando cuenta..." : "Registrarme"}
-          </Button>
-        </form>
-      </CardContent>
-      <CardFooter className="justify-center">
-        <p className="text-sm text-gray-500">
-          ¿Ya tenés cuenta?{" "}
-          <Link
-            href="/login"
-            className="font-medium text-primary hover:underline"
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Nombre completo
+            </label>
+            <input
+              type="text"
+              placeholder="Tu nombre"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              required
+              className="w-full h-11 rounded-xl border border-gray-300 bg-gray-50 px-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Correo electronico
+            </label>
+            <input
+              type="email"
+              placeholder="tu@correo.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full h-11 rounded-xl border border-gray-300 bg-gray-50 px-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Contrasena
+            </label>
+            <input
+              type="password"
+              placeholder="Minimo 6 caracteres"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full h-11 rounded-xl border border-gray-300 bg-gray-50 px-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Confirmar contrasena
+            </label>
+            <input
+              type="password"
+              placeholder="Repeti la contrasena"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              className="w-full h-11 rounded-xl border border-gray-300 bg-gray-50 px-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full h-11 rounded-xl bg-primary text-white font-medium text-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 disabled:opacity-50 transition-all"
           >
-            Iniciar Sesión
-          </Link>
-        </p>
-      </CardFooter>
-    </Card>
+            {loading ? "Creando cuenta..." : "Registrarme"}
+          </button>
+        </form>
+      </div>
+
+      {/* Footer link */}
+      <p className="text-center text-sm text-gray-500 mt-6">
+        Ya tenes cuenta?{" "}
+        <Link
+          href="/login"
+          className="font-semibold text-primary hover:text-primary-dark transition-colors"
+        >
+          Iniciar Sesion
+        </Link>
+      </p>
+    </div>
   );
 }

@@ -4,16 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Music } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -36,7 +29,7 @@ export default function LoginPage() {
     if (error) {
       setError(
         error.message === "Invalid login credentials"
-          ? "Email o contraseña incorrectos"
+          ? "Email o contrasena incorrectos"
           : error.message
       );
       setLoading(false);
@@ -48,52 +41,72 @@ export default function LoginPage() {
   }
 
   return (
-    <Card className="w-full">
-      <CardHeader className="text-center">
-        <CardTitle className="text-xl">Iniciar Sesión</CardTitle>
-        <CardDescription>
-          Ingresá tus credenciales para acceder
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form className="space-y-4" onSubmit={handleLogin}>
+    <div className="w-full">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-4">
+          <Music className="w-6 h-6 text-primary" />
+        </div>
+        <h2 className="text-2xl font-bold text-gray-900">Bienvenido</h2>
+        <p className="text-gray-500 mt-1">
+          Ingresa tus credenciales para acceder
+        </p>
+      </div>
+
+      {/* Form */}
+      <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-6 sm:p-8">
+        <form className="space-y-5" onSubmit={handleLogin}>
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3">
+            <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl p-3.5">
               {error}
             </div>
           )}
-          <Input
-            label="Correo electrónico"
-            type="email"
-            placeholder="tu@correo.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <Input
-            label="Contraseña"
-            type="password"
-            placeholder="Tu contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Entrando..." : "Entrar"}
-          </Button>
-        </form>
-      </CardContent>
-      <CardFooter className="justify-center">
-        <p className="text-sm text-gray-500">
-          ¿No tenés cuenta?{" "}
-          <Link
-            href="/registro"
-            className="font-medium text-primary hover:underline"
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Correo electronico
+            </label>
+            <input
+              type="email"
+              placeholder="tu@correo.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full h-11 rounded-xl border border-gray-300 bg-gray-50 px-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Contrasena
+            </label>
+            <input
+              type="password"
+              placeholder="Tu contrasena"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full h-11 rounded-xl border border-gray-300 bg-gray-50 px-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full h-11 rounded-xl bg-primary text-white font-medium text-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 disabled:opacity-50 transition-all"
           >
-            Registrate
-          </Link>
-        </p>
-      </CardFooter>
-    </Card>
+            {loading ? "Entrando..." : "Iniciar Sesion"}
+          </button>
+        </form>
+      </div>
+
+      {/* Footer link */}
+      <p className="text-center text-sm text-gray-500 mt-6">
+        No tenes cuenta?{" "}
+        <Link
+          href="/registro"
+          className="font-semibold text-primary hover:text-primary-dark transition-colors"
+        >
+          Registrate
+        </Link>
+      </p>
+    </div>
   );
 }
