@@ -41,6 +41,7 @@ src/
         page.tsx         # Lista de programas con filtros y creacion
         [id]/page.tsx    # Detalle: canciones con drag-and-drop, edicion, eliminacion
       calendario/        # Calendario conectado a programas reales
+      eventos/           # Gestion de eventos iglesia (admin: crear/aprobar/publicar/editar/eliminar)
       equipo/            # Gestion de equipo y roles (admin only)
       importar/          # Pagina de importacion (upload individual + Dropbox)
       ajustes/           # Ajustes del usuario (persistidos en Supabase)
