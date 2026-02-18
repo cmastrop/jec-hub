@@ -80,6 +80,15 @@ export interface SetlistSong {
   song?: Pick<Song, "id" | "title" | "artist" | "original_key">;
 }
 
+export interface DropboxToken {
+  id: string;
+  user_id: string;
+  refresh_token: string;
+  account_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface MigratedFile {
   id: string;
   dropbox_path: string;

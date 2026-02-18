@@ -10,7 +10,7 @@ const limiter = new RateLimiter(14, 1400);
 
 export async function POST(request: Request) {
   try {
-    const { jobId, batchSize = 10 } = await request.json();
+    const { jobId, batchSize = 2 } = await request.json();
     if (!jobId) {
       return NextResponse.json(
         { error: "jobId is required" },
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       .select("*")
       .eq("job_id", jobId)
       .eq("status", "pending")
-      .limit(Math.min(batchSize, 14));
+      .limit(Math.min(batchSize, 5));
 
     if (!items || items.length === 0) {
       return NextResponse.json({
@@ -45,10 +45,13 @@ export async function POST(request: Request) {
     let processed = 0;
     let failed = 0;
     let dailyLimitReached = false;
+    const startTime = Date.now();
 
     for (const item of items) {
+      // Safety: stop before Vercel timeout
+      if (Date.now() - startTime > 50000) break;
+
       try {
-        await limiter.waitForSlot();
 
         // Update item status
         await admin
@@ -80,7 +83,7 @@ export async function POST(request: Request) {
         const buffer = Buffer.from(await fileData.arrayBuffer());
 
         // Extract with AI
-        const extractor = getAIExtractor("gemini");
+        const extractor = getAIExtractor("claude");
         const result = await extractor.extractChordPro(
           buffer,
           item.file_type || "image/jpeg"

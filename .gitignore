@@ -33,6 +33,12 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# test scripts with tokens
+scripts/test-*
+
+# original church photos (selected ones are in public/iglesia/)
+/iglesia_fotos
+
 # vercel
 .vercel
 

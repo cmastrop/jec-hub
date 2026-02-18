@@ -1,15 +1,17 @@
-# JEC HUB - Proyecto de Gestion Musical
+# JEC HUB - Plataforma de Gestion Musical
 
-App web para la iglesia "Jesus Es El Camino" (JEC). Gestiona canciones con chord charts, programas de culto, y equipo de musica.
+App web para la iglesia "Jesus Es El Camino" (JEC). Gestiona canciones con chord charts, programas de culto, y equipo de musica. Primer modulo de lo que sera la plataforma integral de la iglesia.
 
 ## Stack
 
 - **Frontend**: Next.js 16 + React 19 + TypeScript (App Router)
 - **Styling**: Tailwind CSS 4
 - **Backend**: Next.js API Routes + Supabase (PostgreSQL, Auth, Storage)
-- **AI**: Gemini (gratis, default) + Claude API (premium, backup) para OCR de chord charts
+- **AI**: Gemini (gratis, importacion individual) + Claude API (premium, migracion masiva)
 - **Drag & Drop**: @dnd-kit (reordenamiento de canciones en setlists)
-- **Deploy**: Vercel (https://jec-hub.vercel.app) — deploy manual con `npx vercel --prod`
+- **Dropbox**: OAuth2 con refresh tokens (conexion permanente, nunca expira)
+- **Deploy**: Vercel — deploy manual con `npx vercel --prod`
+- **Dominios**: `hub.jesuseselcamino.com.au` (produccion) / `jec-hub.vercel.app` (alias)
 - **Repo**: https://github.com/cmastrop/jec-hub
 
 ## Estructura del Proyecto
@@ -35,6 +37,14 @@ src/
       importar/          # Pagina de importacion (upload individual + Dropbox)
       ajustes/           # Ajustes del usuario (persistidos en Supabase)
     api/
+      auth/
+        dropbox/
+          route.ts       # GET iniciar OAuth de Dropbox (redirect a Dropbox)
+          callback/
+            route.ts     # GET callback OAuth (intercambia code por refresh token)
+      dropbox/
+        status/route.ts  # GET verificar si Dropbox esta conectado
+        token/route.ts   # GET token fresco / DELETE desconectar Dropbox
       songs/             # CRUD de canciones
         [id]/
           route.ts       # GET/PATCH/DELETE una cancion
@@ -49,9 +59,9 @@ src/
           route.ts       # GET/PATCH/DELETE setlist individual
           songs/route.ts # POST agregar / PATCH reordenar / DELETE quitar cancion
       migration/         # Migracion masiva desde Dropbox
-        catalog/         # POST listar archivos Dropbox
-        download/        # POST descargar archivos a Storage
-        process/         # POST procesar con AI (usa abstraccion)
+        catalog/         # POST catalogar archivos (detecta resume automatico)
+        download/        # POST descargar archivos a Storage (batch=5, timeout safety)
+        process/         # POST procesar con Claude AI (batch=2, timeout safety)
         status/          # GET estado de migracion
       users/             # Gestion de usuarios (admin only)
         [id]/route.ts    # PATCH rol de usuario
@@ -73,7 +83,8 @@ src/
     setlist/
       song-search-modal.tsx      # Modal busqueda canciones para agregar a setlist
     migration/
-      dropbox-migration.tsx      # Componente migracion Dropbox
+      dropbox-migration.tsx      # Componente migracion Dropbox (fases: conectar/catalogar/descargar/procesar)
+      migration-progress.tsx     # Barra de progreso con errores
     layout/
       sidebar.tsx                # Sidebar de navegacion
       header.tsx                 # Header con menu de usuario + badge admin
@@ -90,22 +101,25 @@ src/
       transpose.ts       # Transposicion de acordes
       chord-position.ts  # Utilidades para mover/agregar/eliminar acordes posicionalmente
       types.ts           # ChordProSong, Section, SectionType, Line, Segment
+    dropbox/
+      oauth.ts           # OAuth URL, exchangeCodeForTokens, refreshAccessToken
+      client.ts          # getDropboxClient, getFreshAccessToken, listAllDropboxFiles, downloadDropboxFile
     gemini/
       client.ts          # Gemini API client (gemini-1.5-flash)
       extract.ts         # extractChordProFromImage()
       prompts.ts         # Prompts de extraccion (compartidos con Claude adapter)
     supabase/
       client.ts          # Supabase browser client
-      server.ts          # Supabase server client (SSR)
+      server.ts          # Supabase server client (SSR) — exporta createClient()
       admin.ts           # Supabase admin client (service role, bypasses RLS)
     migration/
-      utils.ts           # RateLimiter, getFileType, toStoragePath
+      utils.ts           # RateLimiter, getFileType, toStoragePath, isProcessableByGemini
     types/
-      database.ts        # Song, Profile, Setlist, SetlistSong, ImportJob, etc.
+      database.ts        # Song, Profile, Setlist, SetlistSong, ImportJob, ImportItem, DropboxToken, MigratedFile
   hooks/
     use-user.ts          # Hook para perfil/rol del usuario (cached, clearUserCache)
 scripts/
-  migrate.ts             # Script de migracion Dropbox -> Supabase (Claude API, batch)
+  migrate.ts             # Script legacy de migracion Dropbox -> Supabase (Claude API, batch)
 ```
 
 ## Variables de Entorno
@@ -114,18 +128,21 @@ scripts/
 NEXT_PUBLIC_SUPABASE_URL       # URL del proyecto Supabase
 NEXT_PUBLIC_SUPABASE_ANON_KEY  # Clave publica Supabase
 SUPABASE_SERVICE_ROLE_KEY      # Clave de servicio (bypasses RLS)
-GEMINI_API_KEY                 # Google Gemini API (gratis, default)
-ANTHROPIC_API_KEY              # Claude API (premium, opcional)
-NEXT_PUBLIC_DROPBOX_APP_KEY    # Dropbox app key
-DROPBOX_APP_SECRET             # Dropbox app secret
-NEXT_PUBLIC_APP_URL            # URL de la app
+GEMINI_API_KEY                 # Google Gemini API (gratis, importacion individual)
+ANTHROPIC_API_KEY              # Claude API (migracion masiva)
+NEXT_PUBLIC_DROPBOX_APP_KEY    # Dropbox app key (4b1t5mpw1vqxfp4)
+DROPBOX_APP_SECRET             # Dropbox app secret (DEBE tener valor, no vacio)
+NEXT_PUBLIC_APP_URL            # URL de la app (produccion: https://hub.jesuseselcamino.com.au)
 CRON_SECRET                    # Secret para cron jobs
 ```
+
+**IMPORTANTE**: En Vercel, asegurar que las variables no tengan `\n` al final (causa errores como `Invalid client_id`).
 
 ## Base de Datos (Supabase)
 
 ### Tabla `songs`
 - `id` (uuid), `title`, `artist`, `original_key`, `chordpro_content`
+- `tempo` (int), `time_signature` (text), `language`, `notes`
 - `status` ("draft" | "published" | "archived")
 - `source_type` ("manual" | "import_image" | "import_pdf" | "import_dropbox")
 - `original_file_url` (path en Storage bucket "originals")
@@ -133,7 +150,7 @@ CRON_SECRET                    # Secret para cron jobs
 
 ### Tabla `profiles`
 - `id` (uuid, FK auth.users), `email`, `full_name`, `role` ("admin" | "member")
-- `notation_preference`, `font_size_preference`
+- `avatar_url`, `notation_preference` ("letter" | "solfege"), `font_size_preference` (int)
 
 ### Tabla `setlists`
 - `id` (uuid), `title`, `service_type` (domingo/miercoles/jovenes/oracion/especial/otro)
@@ -143,8 +160,52 @@ CRON_SECRET                    # Secret para cron jobs
 - `id` (uuid), `setlist_id` (FK setlists), `song_id` (FK songs)
 - `position` (int, unique per setlist), `transpose_key`, `capo`, `notes`
 
+### Tabla `dropbox_tokens`
+- `id` (uuid), `user_id` (uuid, FK auth.users, UNIQUE), `refresh_token` (text)
+- `account_id` (text), `created_at`, `updated_at`
+- RLS habilitado, acceso solo via service role (admin client)
+
+### Tabla `import_jobs`
+- `id` (uuid), `source` ("dropbox" | "upload"), `status` (pending/processing/completed/failed/paused)
+- `total_files`, `processed_files`, `failed_files`, `error_log` (jsonb)
+- `created_by`, `created_at`, `updated_at`
+
+### Tabla `import_items`
+- `id` (uuid), `job_id` (FK import_jobs), `original_filename`, `file_type`
+- `storage_path`, `status` (pending/processing/completed/failed/skipped/review)
+- `gemini_raw_response`, `extracted_chordpro`, `song_id` (FK songs), `error_message`
+
+### Tabla `migrated_files`
+- `id` (uuid), `dropbox_path` (text, UNIQUE), `storage_path`, `file_type`, `file_size`
+- `dropbox_folder`, `status` (pending/downloading/downloaded/processed/error), `error_message`
+
 ### Storage Bucket: `originals`
 - Archivos originales importados (PDFs, imagenes) desde Dropbox o upload individual
+
+## Dropbox OAuth (Conexion Permanente)
+
+### Flujo
+1. Usuario clickea "Conectar Dropbox" en `/importar`
+2. `GET /api/auth/dropbox` → redirige a Dropbox con `token_access_type=offline`
+3. Dropbox redirige a `GET /api/auth/dropbox/callback` con authorization code
+4. Callback intercambia code por `access_token` + `refresh_token` (NUNCA expira)
+5. `refresh_token` se guarda en tabla `dropbox_tokens` (upsert por user_id)
+6. Cada operacion usa `getFreshAccessToken()` que genera un access_token nuevo con el refresh_token
+
+### Archivos clave
+- `src/lib/dropbox/oauth.ts` — getDropboxAuthUrl, exchangeCodeForTokens, refreshAccessToken
+- `src/lib/dropbox/client.ts` — getFreshAccessToken (busca refresh_token en DB, pide access_token fresco)
+
+### Configuracion requerida en Dropbox App Console
+- Redirect URIs:
+  - `https://hub.jesuseselcamino.com.au/api/auth/dropbox/callback`
+  - `https://jec-hub.vercel.app/api/auth/dropbox/callback`
+  - `http://localhost:3000/api/auth/dropbox/callback` (desarrollo)
+
+### Nota tecnica
+- `downloadDropboxFile()` usa `fetch` directo a la API de Dropbox (NO el SDK)
+- El SDK de Dropbox (`fileBinary`) no funciona en Vercel serverless con `globalThis.fetch`
+- Cada descarga tiene timeout de 30s via `AbortController`
 
 ## AI Providers
 
@@ -152,15 +213,16 @@ Capa de abstraccion en `src/lib/ai/`:
 - **Interface**: `AIExtractor { extractChordPro(buffer, mimeType) -> ExtractionResult }`
 - **Factory**: `getAIExtractor(provider)` retorna Gemini o Claude adapter
 
-### Gemini (default, gratis)
+### Gemini (importacion individual)
 - Modelo: `gemini-1.5-flash`
-- Uso: Importacion individual de archivos desde la web UI
+- Uso: Importacion individual de archivos desde la web UI (`/importar`)
 - Free tier: suficiente para uso diario (pocas canciones)
 
-### Claude (premium, backup)
+### Claude (migracion masiva)
 - Modelo: `claude-sonnet-4-5-20250929`
-- Uso: Migracion masiva (scripts/migrate.ts) + opcion premium en web UI
+- Uso: Migracion masiva via web UI (endpoint `/api/migration/process`)
 - Mejor calidad de OCR, especialmente para archivos dificiles
+- Sin limite diario como Gemini
 
 Ambos usan el mismo prompt de extraccion (definido en `src/lib/gemini/prompts.ts`).
 
@@ -178,7 +240,7 @@ Permisos:
 - Publicar canciones en borrador
 - Ver archivos originales importados (split view)
 - Importar canciones individuales (upload JPG/PNG/PDF + AI)
-- Migrar canciones masivamente desde Dropbox
+- **Migrar canciones masivamente desde Dropbox** (conectar cuenta, catalogar, descargar, procesar)
 - Gestionar usuarios y roles (/equipo)
 - Crear, editar y eliminar programas de culto
 - Agregar/quitar/reordenar canciones en programas
@@ -193,6 +255,16 @@ Permisos:
 - Ver calendario de servicios
 
 ## Features
+
+### Migracion Masiva desde Dropbox (Web UI)
+- Componente: `src/components/migration/dropbox-migration.tsx`
+- Fases: loading → disconnected → idle → cataloging → downloading → processing → paused → completed
+- **Catalogo inteligente**: detecta archivos pendientes y resume sin re-escanear Dropbox
+- **Skip download**: si la descarga ya termino, salta directo al procesamiento
+- **Descarga**: batch=5 archivos, safety timeout 45s, archivos >15MB se saltan, ordena por tamanio (chicos primero)
+- **Procesamiento**: batch=2, Claude API, safety timeout 50s
+- **Retry automatico**: hasta 5 reintentos en timeouts 504 del servidor
+- **Content-type check**: verifica JSON antes de parsear (evita errores en timeouts de Vercel)
 
 ### Ajustes de Usuario
 - Perfil editable (nombre)
@@ -266,13 +338,26 @@ Permisos:
 ## Deploy
 
 - **Plataforma**: Vercel (proyecto `jec-hub` en team `cmastrops-projects`)
-- **URL produccion**: https://jec-hub.vercel.app
+- **Dominio produccion**: `hub.jesuseselcamino.com.au`
+- **Alias Vercel**: `jec-hub.vercel.app`
 - **Auto-deploy NO esta configurado** (no hay webhook de GitHub → Vercel)
 - **Deploy manual**: `npx vercel --prod` desde la raiz del proyecto (CLI autenticado como `cmastrop`)
 - **Force deploy** (sin cache): `npx vercel --prod --force`
-- Para activar auto-deploy: conectar repo en Vercel Dashboard > Settings > Git > GitHub
-- El build usa Turbopack (`next build`), ~30s en Vercel
-- Variables de entorno configuradas en Vercel Dashboard
+- El build usa Turbopack (`next build`), ~23s en Vercel
+- Variables de entorno configuradas en Vercel Dashboard y via `npx vercel env add`
+- **Hobby plan**: funciones serverless max 60s (`maxDuration = 60`)
+
+### DNS
+- Dominio `jesuseselcamino.com.au` registrado en **Crazy Domains** (Australia)
+- Nameservers apuntan a **Vercel**: `ns1.vercel-dns.com`, `ns2.vercel-dns.com`
+- Registros DNS gestionados en Vercel (no en Crazy Domains)
+- Registros actuales:
+  - `@` → A `27.124.125.171` (sitio web iglesia)
+  - `www` → A `27.124.125.171`
+  - `mail` → A `103.20.200.233`
+  - `@` → MX `mail.cleanmysite.com.au` (priority 1)
+  - `hub` → ALIAS Vercel (automatico, sirve JEC Hub)
+- Email activo: `hola@jesuseselcamino.com.au`
 
 ## Middleware (Auth)
 
@@ -284,33 +369,65 @@ Permisos:
 
 ## Migracion Dropbox
 
-### Estado Actual
-- **Primera corrida completada** (parcial — token expiro a ~56%)
-- Canciones creadas: **985 nuevas**
-- Ya existentes (saltadas): 1,000
-- **Total canciones en DB: ~1,985**
-- Fallos: 1,505 (1,460 por token expirado, 11 Claude API, 34 desconocidos)
+### Estado Actual (Segunda Corrida via Web UI)
+- **Descarga completada**: 3,305 archivos descargados a Supabase Storage
+- **Errores de descarga**: 250 (archivos >15MB, timeouts, etc.)
+- **Procesamiento con Claude AI**: en curso (~13,800 archivos pendientes)
+- **Canciones en DB**: ~2,157 (todas como borrador)
+- **Metodo**: Web UI en `/importar` con OAuth de Dropbox (token permanente)
 
-### Pendiente: Segunda Corrida
-- Faltan ~1,500 archivos por procesar (los que fallaron por token expirado)
-- **Paso 1**: Renovar token de Dropbox (el actual expiro durante la migracion)
-- **Paso 2**: Correr `npx tsx scripts/migrate.ts` — el script saltea canciones ya existentes
-- **Paso 3**: Solo procesara los archivos que no se pudieron descargar la primera vez
-- Los errores de Claude API (11) son por mime type incorrecto en algunos archivos corruptos
+### Primera Corrida (Legacy, via script)
+- Script: `scripts/migrate.ts` (usa Claude API directo)
+- Resultado: 985 canciones nuevas, 1,000 saltadas (ya existentes)
+- Fallos: 1,505 (token expirado — motivó la implementación de OAuth)
 
-### Script
-- Archivo: `scripts/migrate.ts`
-- Usa Claude API (premium) para OCR masivo
-- Rate limiter integrado para no exceder limites de API
-- Registra archivos procesados en tabla `migrated_files` para evitar reprocesamiento
+### Limites Vercel (Hobby Plan)
+- Funciones serverless: max 60 segundos
+- Batch de descarga: 5 archivos, safety cut a 45s
+- Batch de procesamiento: 2 archivos, safety cut a 50s
+- Archivos >15MB se marcan como error (no son chord charts)
+- Frontend retry automatico: hasta 5 reintentos en 504/timeout
 
 ## Convenios
 
 - Idioma UI: Espanol
 - Componentes: "use client" explicito, funcional con hooks
 - API: admin client para bypasear RLS, server client para auth checks
+- Import supabase server: `import { createClient } from "@/lib/supabase/server"` (NO `createServerClient`)
 - Estilo: Tailwind utility classes, sin CSS modules
 - Errores API: `{ error: string }` con HTTP status codes apropiados
 - Auth: todas las rutas API verifican autenticacion, admin endpoints verifican rol
 - AI: usar `getAIExtractor()` de `src/lib/ai` para cualquier extraccion OCR
 - Cache: useUser() con module-level cache, clearUserCache() para invalidar
+- Dropbox: usar `getFreshAccessToken()` para obtener token (NUNCA hardcodear tokens)
+
+## Roadmap: JEC Platform
+
+### Vision
+JEC Hub evolucionara a **JEC Platform** — plataforma centralizada de la iglesia accesible desde `jesuseselcamino.com.au`. Multiples ministerios como modulos independientes con autenticacion unificada.
+
+### Fase 1: Consolidacion (proximo)
+- [ ] Apuntar `jesuseselcamino.com.au` a Vercel (el dominio raiz)
+- [ ] Redisenar landing page como portal de la iglesia (no solo musica)
+- [ ] Dashboard post-login con acceso a ministerios
+- [ ] Mover rutas de musica bajo `/musica/*`
+
+### Fase 2: Multi-idioma
+- [ ] Soporte Espanol/Ingles
+- [ ] Preferencia de idioma en perfil de usuario
+- [ ] ~24 archivos con texto hardcodeado en espanol para traducir
+
+### Fase 3: Seguridad avanzada
+- [ ] Verificacion de email (Supabase lo soporta nativamente)
+- [ ] Verificacion de mobile (SMS via Supabase + Twilio)
+
+### Fase 4: Nuevos ministerios
+- [ ] Panel Ministerio Pastoral
+- [ ] Panel Ministerio de Jovenes
+- [ ] Sistema de roles por ministerio (admin de musica vs admin pastoral)
+
+### Fase 5: Rediseno profesional
+- [ ] Redesign completo de la web publica
+- [ ] Branding unificado
+- [ ] Responsive optimizado
+- [ ] SEO y performance

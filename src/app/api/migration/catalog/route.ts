@@ -1,19 +1,84 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { listAllDropboxFiles } from "@/lib/dropbox/client";
+import { listAllDropboxFiles, getFreshAccessToken } from "@/lib/dropbox/client";
 import { getFileType, isProcessableByGemini } from "@/lib/migration/utils";
 
-export async function POST(request: Request) {
+export const maxDuration = 60;
+
+export async function POST() {
   try {
-    const { accessToken } = await request.json();
-    if (!accessToken) {
-      return NextResponse.json(
-        { error: "accessToken is required" },
-        { status: 400 }
-      );
+    // Get authenticated user
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: "No autenticado" }, { status: 401 });
     }
 
     const admin = createAdminClient();
+
+    // Check if there's already work in progress (pending downloads or pending processing)
+    const { count: pendingDownloads } = await admin
+      .from("migrated_files")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "pending");
+
+    const { count: pendingProcess } = await admin
+      .from("import_items")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "pending");
+
+    const { count: downloadedCount } = await admin
+      .from("migrated_files")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "downloaded");
+
+    if ((pendingDownloads && pendingDownloads > 0) || (pendingProcess && pendingProcess > 0)) {
+      // Resume existing work
+      const { data: existingJob } = await admin
+        .from("import_jobs")
+        .select("id")
+        .eq("source", "dropbox")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      const { count: totalCount } = await admin
+        .from("migrated_files")
+        .select("*", { count: "exact", head: true });
+
+      let jobId = existingJob?.id;
+
+      if (!jobId) {
+        const { data: newJob } = await admin
+          .from("import_jobs")
+          .insert({
+            source: "dropbox",
+            total_files: totalCount || 0,
+            status: "pending",
+          })
+          .select()
+          .single();
+        jobId = newJob?.id;
+      }
+
+      return NextResponse.json({
+        jobId,
+        totalFiles: totalCount || 0,
+        processableFiles: pendingProcess || 0,
+        downloadRemaining: pendingDownloads || 0,
+        downloaded: downloadedCount || 0,
+        resumed: true,
+        // Tell frontend to skip download if no pending downloads
+        skipDownload: !pendingDownloads || pendingDownloads === 0,
+      });
+    }
+
+    // Fresh catalog: get token and scan Dropbox
+    const accessToken = await getFreshAccessToken(user.id);
 
     // List all files from Dropbox
     const files = await listAllDropboxFiles(accessToken);
@@ -69,9 +134,13 @@ export async function POST(request: Request) {
       mediaFiles: files.length - processable.length,
     });
   } catch (err) {
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : String(err) },
-      { status: 500 }
-    );
+    const message = err instanceof Error ? err.message : String(err);
+    if (message === "DROPBOX_NOT_CONNECTED") {
+      return NextResponse.json(
+        { error: "Dropbox no conectado. Conectá tu cuenta primero." },
+        { status: 400 }
+      );
+    }
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
