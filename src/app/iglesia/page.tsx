@@ -94,6 +94,9 @@ const t = {
     footerChurch: "Spanish & English-Speaking Church",
     footerPlatform: "Ministry Platform",
     mobileSunday: "Sunday 3:00 PM — 5:00 PM",
+    churchName: "Jesus Is The Way",
+    heroLine1: "Jesus Is The",
+    heroAccent: "Way",
   },
   es: {
     navHome: "Inicio",
@@ -168,6 +171,9 @@ const t = {
     footerChurch: "Iglesia de Habla Hispana e Inglés",
     footerPlatform: "Plataforma del Ministerio",
     mobileSunday: "Domingo 3:00 PM — 5:00 PM",
+    churchName: "Jesús Es El Camino",
+    heroLine1: "Jesús Es El",
+    heroAccent: "Camino",
   },
 };
 
@@ -282,7 +288,7 @@ export default function IglesiaPage() {
                 }`}
                 style={serif}
               >
-                Jesús Es El Camino
+                {l.churchName}
               </span>
             </button>
 
@@ -377,7 +383,7 @@ export default function IglesiaPage() {
                       className="w-16 h-16 rounded-full shadow-lg"
                     />
                     <span className="text-lg text-[#4A3F35]" style={serif}>
-                      Jesús Es El Camino
+                      {l.churchName}
                     </span>
                   </div>
                   <nav className="flex-1 px-6 space-y-1">
@@ -440,12 +446,12 @@ export default function IglesiaPage() {
               textShadow: "4px 4px 16px rgba(0,0,0,0.5)",
             }}
           >
-            Jesús Es El{" "}
+            {l.heroLine1}{" "}
             <span
               className="text-[#C9A86C]"
               style={{ textShadow: "2px 2px 12px rgba(201,168,108,0.4)" }}
             >
-              Camino
+              {l.heroAccent}
             </span>
           </h1>
 
@@ -935,7 +941,7 @@ export default function IglesiaPage() {
           <div className="flex flex-col items-center gap-5">
             <img
               src="/iglesia/logo.png"
-              alt="Jesús Es El Camino"
+              alt={l.churchName}
               className="w-14 h-14 rounded-full opacity-80"
             />
             <p
