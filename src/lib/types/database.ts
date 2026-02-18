@@ -80,6 +80,27 @@ export interface SetlistSong {
   song?: Pick<Song, "id" | "title" | "artist" | "original_key">;
 }
 
+export type EventType = "service" | "youth" | "prayer" | "special" | "community" | "conference";
+export type EventStatus = "draft" | "approved" | "published";
+
+export interface ChurchEvent {
+  id: string;
+  title: string;
+  description: string | null;
+  event_date: string;
+  start_time: string | null;
+  end_time: string | null;
+  location: string | null;
+  event_type: EventType;
+  status: EventStatus;
+  recurring: boolean;
+  recurring_day: string | null; // "sunday", "wednesday", etc.
+  created_by: string | null;
+  approved_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface DropboxToken {
   id: string;
   user_id: string;

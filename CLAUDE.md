@@ -53,6 +53,9 @@ src/
       dropbox/
         status/route.ts  # GET verificar si Dropbox esta conectado
         token/route.ts   # GET token fresco / DELETE desconectar Dropbox
+      events/            # Eventos publicos de la iglesia
+        route.ts         # GET publico (published) / POST crear (admin)
+        [id]/route.ts    # GET/PATCH/DELETE evento individual (admin)
       songs/             # CRUD de canciones
         [id]/
           route.ts       # GET/PATCH/DELETE una cancion
@@ -167,6 +170,38 @@ CRON_SECRET                    # Secret para cron jobs
 ### Tabla `setlist_songs`
 - `id` (uuid), `setlist_id` (FK setlists), `song_id` (FK songs)
 - `position` (int, unique per setlist), `transpose_key`, `capo`, `notes`
+
+### Tabla `church_events`
+- `id` (uuid), `title` (text), `description` (text)
+- `event_date` (date), `start_time` (text), `end_time` (text)
+- `location` (text, default "73 Nollamara Ave, Nollamara WA 6061")
+- `event_type` (text: service/youth/prayer/special/community/conference)
+- `status` (text: draft/approved/published) — solo published se muestra en la web publica
+- `recurring` (boolean), `recurring_day` (text: sunday/wednesday/etc)
+- `created_by` (uuid, FK auth.users), `approved_by` (uuid, FK auth.users)
+- `created_at`, `updated_at`
+- **Flujo de aprobacion**: admin/pastor crea evento (draft) → aprueba (approved) → publica (published)
+- **SQL para crear tabla**:
+```sql
+CREATE TABLE church_events (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  title text NOT NULL,
+  description text,
+  event_date date NOT NULL,
+  start_time text,
+  end_time text,
+  location text DEFAULT '73 Nollamara Ave, Nollamara WA 6061',
+  event_type text DEFAULT 'service' CHECK (event_type IN ('service','youth','prayer','special','community','conference')),
+  status text DEFAULT 'draft' CHECK (status IN ('draft','approved','published')),
+  recurring boolean DEFAULT false,
+  recurring_day text,
+  created_by uuid REFERENCES auth.users(id),
+  approved_by uuid REFERENCES auth.users(id),
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+ALTER TABLE church_events ENABLE ROW LEVEL SECURITY;
+```
 
 ### Tabla `dropbox_tokens`
 - `id` (uuid), `user_id` (uuid, FK auth.users, UNIQUE), `refresh_token` (text)
@@ -332,11 +367,24 @@ Permisos:
 - Soporta: JPG, PNG, WebP, PDF (max 10MB)
 - Crea borrador, redirect al editor
 
+### Calendario Publico de Eventos (`/iglesia` section + API)
+- Seccion de calendario en la pagina de la iglesia (entre Pastores y Contacto)
+- **API publica**: `GET /api/events` retorna solo eventos con `status: "published"`
+- **API admin**: `POST /api/events`, `PATCH/DELETE /api/events/[id]` requieren rol admin
+- **Grilla mensual**: navegacion por mes, badges de eventos coloreados por tipo
+- **Lista de eventos**: cards con fecha, hora, ubicacion, descripcion
+- **Google Calendar**: link para agregar cada evento al calendario de Google
+- **Flujo de aprobacion**: admin crea evento (draft) → aprueba → publica
+- **Tipos de evento**: service (gold), youth (verde), prayer (violeta), special (rojo), community (azul), conference (naranja)
+- **Bilingue**: traducciones completas EN/ES para meses, dias, labels
+- **Estado vacio**: icono de calendario + mensaje "no hay eventos" cuando no hay datos
+- **Requiere tabla**: `church_events` en Supabase (ver SQL en seccion Base de Datos)
+
 ### Pagina Publica de la Iglesia (`/iglesia`)
 - Accesible en `jesuseselcamino.com.au` (middleware rewrite) y `hub.../iglesia` (directo)
 - **Bilingue**: toggle EN/ES en header, traduce TODO el contenido incluido nombre de la iglesia
 - **EN**: "Jesus Is The Way" / **ES**: "Jesus Es El Camino"
-- Secciones: Hero → Servicios → Vision (3 pilares) → Mision → Ministerios (4 cards) → Pastores → Contacto → Footer
+- Secciones: Hero → Servicios → Vision (3 pilares) → Mision → Ministerios (4 cards) → Pastores → Eventos → Contacto → Footer
 - **Hero**: full-screen con foto, logo, nombre iglesia, CTA, scroll indicator
 - **Servicios**: Domingo 3-5PM + Miercoles 7:30-9PM con fotos, link Google Maps
 - **Vision**: 3 pilares (Equipar/Enviar/Alcanzar) con iconos y cards
