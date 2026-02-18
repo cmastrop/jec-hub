@@ -378,7 +378,7 @@ Permisos:
 - **Tipos de evento**: service (gold), youth (verde), prayer (violeta), special (rojo), community (azul), conference (naranja)
 - **Bilingue**: traducciones completas EN/ES para meses, dias, labels
 - **Estado vacio**: icono de calendario + mensaje "no hay eventos" cuando no hay datos
-- **Requiere tabla**: `church_events` en Supabase (ver SQL en seccion Base de Datos)
+- **Tabla creada**: `church_events` en Supabase (ya existe en produccion)
 
 ### Pagina Publica de la Iglesia (`/iglesia`)
 - Accesible en `jesuseselcamino.com.au` (middleware rewrite) y `hub.../iglesia` (directo)
