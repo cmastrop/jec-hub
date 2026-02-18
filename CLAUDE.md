@@ -1,6 +1,6 @@
-# JEC HUB - Plataforma de Gestion Musical
+# JEC Platform - Plataforma Integral de la Iglesia
 
-App web para la iglesia "Jesus Es El Camino" (JEC). Gestiona canciones con chord charts, programas de culto, y equipo de musica. Primer modulo de lo que sera la plataforma integral de la iglesia.
+Plataforma web para la iglesia "Jesus Es El Camino" (JEC). Incluye sitio publico de la iglesia (`jesuseselcamino.com.au`) y plataforma de gestion musical (`hub.jesuseselcamino.com.au`). Gestiona canciones con chord charts, programas de culto, equipo de musica, y pagina publica bilingue de la iglesia.
 
 ## Stack
 
@@ -10,17 +10,25 @@ App web para la iglesia "Jesus Es El Camino" (JEC). Gestiona canciones con chord
 - **AI**: Gemini (gratis, importacion individual) + Claude API (premium, migracion masiva)
 - **Drag & Drop**: @dnd-kit (reordenamiento de canciones en setlists)
 - **Dropbox**: OAuth2 con refresh tokens (conexion permanente, nunca expira)
+- **Animaciones**: framer-motion (menu mobile iglesia) + CSS IntersectionObserver (scroll animations)
 - **Deploy**: Vercel — deploy manual con `npx vercel --prod`
-- **Dominios**: `hub.jesuseselcamino.com.au` (produccion) / `jec-hub.vercel.app` (alias)
+- **Dominios**:
+  - `jesuseselcamino.com.au` → pagina publica de la iglesia (`/iglesia`)
+  - `www.jesuseselcamino.com.au` → idem (redirect)
+  - `hub.jesuseselcamino.com.au` → plataforma de gestion musical
+  - `jec-hub.vercel.app` → alias Vercel
 - **Repo**: https://github.com/cmastrop/jec-hub
 
 ## Estructura del Proyecto
 
 ```
 src/
-  middleware.ts           # Auth middleware (rutas publicas, redirects)
+  middleware.ts           # Auth middleware + church domain rewrite
   app/
-    page.tsx              # Landing page (split-screen, features, CTAs)
+    page.tsx              # Landing page JEC Hub (split-screen, features, CTAs)
+    iglesia/             # Pagina publica de la iglesia (jesuseselcamino.com.au)
+      layout.tsx         # Layout con Playfair Display font + SEO metadata
+      page.tsx           # Single-page bilingue (EN/ES): hero, servicios, vision, mision, ministerios, pastores, contacto con formulario
     (auth)/              # Layout de autenticacion (login/registro)
       layout.tsx         # Split layout con imagen de adoracion + form
       login/page.tsx     # Pagina de login
@@ -324,7 +332,27 @@ Permisos:
 - Soporta: JPG, PNG, WebP, PDF (max 10MB)
 - Crea borrador, redirect al editor
 
-### Landing Page
+### Pagina Publica de la Iglesia (`/iglesia`)
+- Accesible en `jesuseselcamino.com.au` (middleware rewrite) y `hub.../iglesia` (directo)
+- **Bilingue**: toggle EN/ES en header, traduce TODO el contenido incluido nombre de la iglesia
+- **EN**: "Jesus Is The Way" / **ES**: "Jesus Es El Camino"
+- Secciones: Hero → Servicios → Vision (3 pilares) → Mision → Ministerios (4 cards) → Pastores → Contacto → Footer
+- **Hero**: full-screen con foto, logo, nombre iglesia, CTA, scroll indicator
+- **Servicios**: Domingo 3-5PM + Miercoles 7:30-9PM con fotos, link Google Maps
+- **Vision**: 3 pilares (Equipar/Enviar/Alcanzar) con iconos y cards
+- **Mision**: "Hacer Discipulos para Cristo" con parallax background
+- **Ministerios**: 4 cards (Hombres, Mujeres, Jovenes "Zoe Zone", Escuela Dominical) con fotos overlay
+- **Pastores**: Pastor Morris & Daisy Velasquez, foto, bio, stats (35+ anos, 2 idiomas)
+- **Contacto**: info (telefonos, email) + ubicacion (Google Maps) + formulario de contacto (mailto)
+- **Formulario de contacto**: nombre, email, telefono (opcional), mensaje → abre mail client
+- **Header sticky**: transparente sobre hero, solido con blur al scrollear
+- **Mobile menu**: slide-in drawer con framer-motion (AnimatePresence)
+- **Animaciones**: FadeInOnScroll con IntersectionObserver + CSS transitions (NO framer-motion para evitar SSR blank)
+- **Paleta**: parchment `#FAF8F5`, gold `#C9A86C`, dark brown `#4A3F35`, medium `#6B5D4D`
+- **Fuente**: Playfair Display (serif) para titulos, Geist (sans) heredado del root layout
+- Imagenes en `public/iglesia/` (hero, pastores, ministerios, worship, etc.)
+
+### Landing Page JEC Hub (`/`)
 - Diseno split-screen igual que login (imagen de adoracion a la izquierda)
 - Panel derecho: logo, grid de features (Canciones, Programas, Calendario, Equipo), CTAs
 - Botones: "Iniciar Sesion" (primary) + "Crear Cuenta" (outline)
@@ -338,7 +366,8 @@ Permisos:
 ## Deploy
 
 - **Plataforma**: Vercel (proyecto `jec-hub` en team `cmastrops-projects`)
-- **Dominio produccion**: `hub.jesuseselcamino.com.au`
+- **Dominio iglesia**: `jesuseselcamino.com.au` (+ `www.`) → sirve `/iglesia`
+- **Dominio hub**: `hub.jesuseselcamino.com.au` → sirve plataforma musical
 - **Alias Vercel**: `jec-hub.vercel.app`
 - **Auto-deploy NO esta configurado** (no hay webhook de GitHub → Vercel)
 - **Deploy manual**: `npx vercel --prod` desde la raiz del proyecto (CLI autenticado como `cmastrop`)
@@ -352,16 +381,21 @@ Permisos:
 - Nameservers apuntan a **Vercel**: `ns1.vercel-dns.com`, `ns2.vercel-dns.com`
 - Registros DNS gestionados en Vercel (no en Crazy Domains)
 - Registros actuales:
-  - `@` → A `27.124.125.171` (sitio web iglesia)
-  - `www` → A `27.124.125.171`
+  - `@` → ALIAS Vercel (sirve pagina iglesia via middleware rewrite a `/iglesia`)
+  - `www` → ALIAS Vercel (idem)
+  - `*` → ALIAS Vercel (wildcard)
+  - `hub` → ALIAS Vercel (sirve JEC Hub plataforma musical)
   - `mail` → A `103.20.200.233`
   - `@` → MX `mail.cleanmysite.com.au` (priority 1)
-  - `hub` → ALIAS Vercel (automatico, sirve JEC Hub)
+  - `@` → CAA `0 issue "letsencrypt.org"`
+- **A records viejos eliminados**: `27.124.125.171` ya no existe (era sitio viejo)
 - Email activo: `hola@jesuseselcamino.com.au`
 
-## Middleware (Auth)
+## Middleware (Auth + Domain Routing)
 
 - Archivo: `src/middleware.ts`
+- **Church domain detection**: `jesuseselcamino.com.au` / `www.` → rewrite a `/iglesia` (URL limpia)
+- Rutas `/iglesia` siempre publicas (sin auth, sin importar dominio)
 - Rutas publicas (sin auth): `/`, `/login`, `/registro`, `/api/*`
 - Unauthenticated → redirige a `/login`
 - Authenticated en `/login` o `/registro` → redirige a `/canciones`
@@ -406,9 +440,10 @@ Permisos:
 ### Vision
 JEC Hub evolucionara a **JEC Platform** — plataforma centralizada de la iglesia accesible desde `jesuseselcamino.com.au`. Multiples ministerios como modulos independientes con autenticacion unificada.
 
-### Fase 1: Consolidacion (proximo)
-- [ ] Apuntar `jesuseselcamino.com.au` a Vercel (el dominio raiz)
-- [ ] Redisenar landing page como portal de la iglesia (no solo musica)
+### Fase 1: Consolidacion (en progreso)
+- [x] Apuntar `jesuseselcamino.com.au` a Vercel (dominio raiz + www)
+- [x] Pagina publica de la iglesia bilingue (`/iglesia`) con formulario de contacto
+- [x] Middleware domain routing (church domain → `/iglesia`)
 - [ ] Dashboard post-login con acceso a ministerios
 - [ ] Mover rutas de musica bajo `/musica/*`
 
