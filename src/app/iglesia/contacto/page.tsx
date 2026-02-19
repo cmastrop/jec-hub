@@ -58,10 +58,10 @@ export default function ContactoPage() {
       <section className="bg-[#FAF8F5] pb-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative z-10 -mt-12 sm:-mt-16 lg:-mt-20">
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-3 gap-6 items-stretch">
               {/* Phone Card */}
-              <FadeIn delay={0}>
-                <div className="bg-white rounded-xl p-8 text-center shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500">
+              <FadeIn delay={0} className="h-full">
+                <div className="bg-white rounded-xl p-8 text-center shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 h-full flex flex-col items-center justify-center">
                   <div className="w-14 h-14 bg-[#C9A86C]/10 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Phone className="w-6 h-6 text-[#C9A86C]" />
                   </div>
@@ -78,8 +78,8 @@ export default function ContactoPage() {
               </FadeIn>
 
               {/* Email Card */}
-              <FadeIn delay={150}>
-                <div className="bg-white rounded-xl p-8 text-center shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500">
+              <FadeIn delay={150} className="h-full">
+                <div className="bg-white rounded-xl p-8 text-center shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 h-full flex flex-col items-center justify-center">
                   <div className="w-14 h-14 bg-[#C9A86C]/10 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Mail className="w-6 h-6 text-[#C9A86C]" />
                   </div>
@@ -93,8 +93,8 @@ export default function ContactoPage() {
               </FadeIn>
 
               {/* Location Card */}
-              <FadeIn delay={300}>
-                <div className="bg-white rounded-xl p-8 text-center shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500">
+              <FadeIn delay={300} className="h-full">
+                <div className="bg-white rounded-xl p-8 text-center shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 h-full flex flex-col items-center justify-center">
                   <div className="w-14 h-14 bg-[#C9A86C]/10 rounded-full flex items-center justify-center mx-auto mb-4">
                     <MapPin className="w-6 h-6 text-[#C9A86C]" />
                   </div>

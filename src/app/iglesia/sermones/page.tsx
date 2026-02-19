@@ -20,7 +20,7 @@ export default function SermonesPage() {
       speaker: l.sermonsPastorMorris,
       date: "Feb 16, 2025",
       duration: "42 min",
-      image: "/iglesia/preaching.jpg",
+      image: "/iglesia/sermon-1.jpg",
     },
     {
       title: l.sermon2Title,
@@ -29,7 +29,7 @@ export default function SermonesPage() {
       speaker: l.sermonsPastorMorris,
       date: "Feb 9, 2025",
       duration: "38 min",
-      image: "/iglesia/speaker.jpg",
+      image: "/iglesia/sermon-2.jpg",
     },
     {
       title: l.sermon3Title,
@@ -38,7 +38,7 @@ export default function SermonesPage() {
       speaker: l.sermonsPastorMorris,
       date: "Feb 2, 2025",
       duration: "45 min",
-      image: "/iglesia/worship.jpg",
+      image: "/iglesia/sermon-3.jpg",
     },
     {
       title: l.sermon4Title,
@@ -47,7 +47,7 @@ export default function SermonesPage() {
       speaker: l.sermonsPastorMorris,
       date: "Jan 26, 2025",
       duration: "40 min",
-      image: "/iglesia/hero-service.jpg",
+      image: "/iglesia/sermon-4.jpg",
     },
     {
       title: l.sermon5Title,
@@ -56,7 +56,7 @@ export default function SermonesPage() {
       speaker: l.sermonsPastorMorris,
       date: "Jan 19, 2025",
       duration: "36 min",
-      image: "/iglesia/musicians.jpg",
+      image: "/iglesia/sermon-5.jpg",
     },
     {
       title: l.sermon6Title,
@@ -65,7 +65,7 @@ export default function SermonesPage() {
       speaker: l.sermonsPastorMorris,
       date: "Jan 12, 2025",
       duration: "44 min",
-      image: "/iglesia/worship.jpg",
+      image: "/iglesia/sermon-6.jpg",
     },
   ];
 
@@ -75,7 +75,7 @@ export default function SermonesPage() {
   return (
     <>
       <PageHero
-        image="/iglesia/preaching.jpg"
+        image="/iglesia/sermon-1.jpg"
         label={l.sermonsLabel}
         title={l.sermonsTitle1}
         titleAccent={l.sermonsTitle2}

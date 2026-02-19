@@ -46,7 +46,7 @@ export default function DonarPage() {
   return (
     <>
       <PageHero
-        image="/iglesia/worship.jpg"
+        image="/iglesia/sermon-3.jpg"
         label={l.giveLabel}
         title={l.giveTitle1}
         titleAccent={l.giveTitle2}

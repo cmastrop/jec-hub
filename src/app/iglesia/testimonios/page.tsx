@@ -18,44 +18,44 @@ export default function TestimoniosPage() {
       category: lang === "en" ? "Family Restored" : "Familia Restaurada",
       name: l.testimony1Name,
       quote: l.testimony1Quote,
-      image: "/iglesia/worship.jpg",
+      image: "/iglesia/testimony-1.jpg",
     },
     {
       category: lang === "en" ? "Finding Community" : "Encontrando Comunidad",
       name: l.testimony2Name,
       quote: l.testimony2Quote,
-      image: "/iglesia/youth.jpg",
+      image: "/iglesia/testimony-2.jpg",
     },
     {
       category: lang === "en" ? "Pastoral Care" : "Cuidado Pastoral",
       name: l.testimony3Name,
       quote: l.testimony3Quote,
-      image: "/iglesia/preaching.jpg",
+      image: "/iglesia/testimony-3.jpg",
     },
     {
       category: lang === "en" ? "New Beginnings" : "Nuevos Comienzos",
       name: l.testimony4Name,
       quote: l.testimony4Quote,
-      image: "/iglesia/hero-service.jpg",
+      image: "/iglesia/testimony-4.jpg",
     },
     {
       category: lang === "en" ? "Brotherhood" : "Hermandad",
       name: l.testimony5Name,
       quote: l.testimony5Quote,
-      image: "/iglesia/mens-group.jpg",
+      image: "/iglesia/testimony-5.jpg",
     },
     {
       category: lang === "en" ? "Next Generation" : "Próxima Generación",
       name: l.testimony6Name,
       quote: l.testimony6Quote,
-      image: "/iglesia/children.jpg",
+      image: "/iglesia/testimony-6.jpg",
     },
   ];
 
   return (
     <>
       <PageHero
-        image="/iglesia/hero-service.jpg"
+        image="/iglesia/testimony-4.jpg"
         label={l.testimoniesPageLabel}
         title={l.testimoniesPageTitle1}
         titleAccent={l.testimoniesPageTitle2}
