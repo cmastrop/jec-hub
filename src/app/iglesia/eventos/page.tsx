@@ -103,7 +103,8 @@ export default function EventosPage() {
       <PageHero
         image="/iglesia/hero-service.jpg"
         label={l.eventsLabel}
-        title={l.eventsTitle}
+        title={l.eventsTitle1}
+        titleAccent={l.eventsTitle2}
       />
 
       <section className="py-24 md:py-32 bg-[#FAF8F5]">
@@ -144,7 +145,7 @@ export default function EventosPage() {
               </div>
 
               {/* Calendar grid */}
-              <div className="bg-white shadow-sm border border-[#E8E0D5]/50 overflow-hidden">
+              <div className="bg-white shadow-sm border border-[#E8E0D5]/50 rounded-xl overflow-hidden">
                 {/* Day headers */}
                 <div className="grid grid-cols-7 border-b border-[#E8E0D5]">
                   {l.eventsDays.map((day: string) => (
@@ -187,7 +188,7 @@ export default function EventosPage() {
                                   href={buildGoogleCalUrl(ev)}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="block text-[10px] sm:text-xs px-1.5 py-0.5 rounded truncate text-white hover:opacity-80 transition-opacity"
+                                  className="block text-[10px] sm:text-xs px-1.5 py-0.5 rounded-md truncate text-white hover:opacity-80 transition-opacity"
                                   style={{
                                     backgroundColor:
                                       eventTypeColors[ev.event_type] || "#C9A86C",
@@ -209,13 +210,13 @@ export default function EventosPage() {
               {/* Events list */}
               {events.length > 0 ? (
                 <div className="mt-8 space-y-4">
-                  {events.map((ev) => (
-                    <FadeIn key={ev.id}>
-                      <div className="flex gap-4 sm:gap-6 bg-white p-4 sm:p-6 shadow-sm border border-[#E8E0D5]/50 hover:shadow-md transition-shadow">
+                  {events.map((ev, i) => (
+                    <FadeIn key={ev.id} delay={i * 80}>
+                      <div className="flex gap-4 sm:gap-6 bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-[#E8E0D5]/50 hover:shadow-lg transition-shadow">
                         {/* Date badge */}
                         <div className="flex-shrink-0 w-14 sm:w-16 text-center">
                           <div
-                            className="text-white text-xs font-medium py-1 uppercase tracking-wide"
+                            className="text-white text-xs font-medium py-1 uppercase tracking-wide rounded-t-md"
                             style={{
                               backgroundColor:
                                 eventTypeColors[ev.event_type] || "#C9A86C",
@@ -225,7 +226,7 @@ export default function EventosPage() {
                               new Date(ev.event_date + "T12:00:00").getMonth()
                             ]?.substring(0, 3)}
                           </div>
-                          <div className="text-2xl sm:text-3xl font-semibold text-[#4A3F35] py-2 border border-t-0 border-[#E8E0D5]">
+                          <div className="text-2xl sm:text-3xl font-semibold text-[#4A3F35] py-2 border border-t-0 border-[#E8E0D5] rounded-b-md">
                             {new Date(ev.event_date + "T12:00:00").getDate()}
                           </div>
                         </div>
@@ -276,7 +277,7 @@ export default function EventosPage() {
                   ))}
                 </div>
               ) : (
-                <div className="mt-8 text-center py-12 bg-white shadow-sm border border-[#E8E0D5]/50">
+                <div className="mt-8 text-center py-12 bg-white shadow-sm border border-[#E8E0D5]/50 rounded-xl">
                   <Calendar className="w-12 h-12 text-[#C9A86C]/40 mx-auto mb-4" />
                   <p className="text-[#6B5D4D] text-sm">{l.eventsEmpty}</p>
                 </div>

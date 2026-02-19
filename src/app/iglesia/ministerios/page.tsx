@@ -23,7 +23,8 @@ export default function MinisteriosPage() {
       <PageHero
         image="/iglesia/musicians.jpg"
         label={l.ministriesLabel}
-        title={l.ministriesTitle}
+        title={l.ministriesTitle1}
+        titleAccent={l.ministriesTitle2}
       />
 
       <section className="py-24 md:py-32 bg-[#FAF8F5]">
@@ -36,8 +37,8 @@ export default function MinisteriosPage() {
 
           <div className="grid sm:grid-cols-2 gap-6 lg:gap-8">
             {ministries.map((ministry, i) => (
-              <FadeIn key={ministry.title} delay={i * 100} variant={i % 2 === 0 ? "fade-right" : "fade-left"}>
-                <div className="group relative overflow-hidden h-80 sm:h-96 shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-500">
+              <FadeIn key={ministry.title} delay={i * 150} variant={i % 2 === 0 ? "fade-right" : "fade-left"}>
+                <div className="group relative overflow-hidden h-80 sm:h-96 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-500">
                   <img
                     src={ministry.img}
                     alt={ministry.title}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Sun, Moon, MapPin, ChevronDown, ArrowRight } from "lucide-react";
+import { Sun, Moon, MapPin, ArrowRight } from "lucide-react";
 import { useLang } from "@/lib/iglesia/use-lang";
 import { translations } from "@/lib/iglesia/translations";
 import { FadeIn } from "@/components/iglesia/fade-in";
@@ -47,12 +47,12 @@ export default function IglesiaPage() {
           </p>
 
           <h1
-            className="text-4xl sm:text-5xl lg:text-7xl text-white mb-6 leading-tight"
+            className="text-4xl sm:text-5xl lg:text-7xl text-white mb-6 leading-tight font-light"
             style={{ ...serif, textShadow: "4px 4px 16px rgba(0,0,0,0.5)" }}
           >
             {l.heroLine1}{" "}
             <span
-              className="text-[#C9A86C]"
+              className="text-[#C9A86C] font-bold"
               style={{ textShadow: "2px 2px 12px rgba(201,168,108,0.4)" }}
             >
               {l.heroAccent}
@@ -77,10 +77,10 @@ export default function IglesiaPage() {
 
           <Link
             href="/iglesia/contacto"
-            className="inline-flex items-center gap-2 bg-[#C9A86C] hover:bg-[#B8956A] text-white font-medium px-10 py-4 text-sm tracking-wide transition-all shadow-lg uppercase hover:scale-105 active:scale-95"
+            className="inline-flex items-center gap-2 bg-[#C9A86C] hover:bg-[#B8956A] text-white font-medium px-10 py-4 rounded-full text-sm tracking-wide transition-all shadow-lg uppercase hover:scale-105 active:scale-95"
           >
             {l.heroCta}
-            <ChevronDown className="w-4 h-4 animate-bounce" />
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 
@@ -96,70 +96,73 @@ export default function IglesiaPage() {
         </div>
       </section>
 
-      {/* ═══ SERVICE TIMES ═══ */}
-      <section className="py-24 md:py-32 bg-[#FAF8F5]">
+      {/* ═══ SERVICE TIMES (overlapping hero) ═══ */}
+      <section className="pb-24 md:pb-32 bg-[#FAF8F5]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeIn>
-            <SectionHeading label={l.servicesLabel} title={l.servicesTitle} />
-          </FadeIn>
-
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-16">
-            {/* Sunday */}
-            <FadeIn>
-              <div className="group relative overflow-hidden bg-white shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-500">
-                <div className="relative h-56 overflow-hidden">
-                  <img
-                    src="/iglesia/preaching.jpg"
-                    alt={l.sundayTitle}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#4A3F35]/80 via-[#4A3F35]/30 to-transparent" />
-                  <div className="absolute top-4 left-4">
-                    <div className="w-12 h-12 bg-[#C9A86C] flex items-center justify-center">
-                      <Sun className="w-6 h-6 text-white" />
+          {/* Overlapping cards */}
+          <div className="relative z-10 -mt-12 sm:-mt-16 lg:-mt-20 mb-16">
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              {/* Sunday */}
+              <FadeIn delay={200}>
+                <div className="group relative overflow-hidden bg-white rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500">
+                  <div className="relative h-56 overflow-hidden">
+                    <img
+                      src="/iglesia/preaching.jpg"
+                      alt={l.sundayTitle}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#4A3F35]/80 via-[#4A3F35]/30 to-transparent" />
+                    <div className="absolute top-4 left-4">
+                      <div className="w-12 h-12 bg-[#C9A86C] rounded-lg flex items-center justify-center">
+                        <Sun className="w-6 h-6 text-white" />
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="p-6 sm:p-8">
-                  <h3 className="text-xl text-[#4A3F35] mb-2" style={serif}>
-                    {l.sundayTitle}
-                  </h3>
-                  <p className="text-2xl font-semibold text-[#C9A86C] mb-1">
-                    3:00 PM — 5:00 PM
-                  </p>
-                  <p className="text-sm text-[#6B5D4D]">{l.sundayDesc}</p>
-                </div>
-              </div>
-            </FadeIn>
-
-            {/* Wednesday */}
-            <FadeIn delay={150}>
-              <div className="group relative overflow-hidden bg-white shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-500">
-                <div className="relative h-56 overflow-hidden">
-                  <img
-                    src="/iglesia/worship.jpg"
-                    alt={l.wednesdayTitle}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#4A3F35]/80 via-[#4A3F35]/30 to-transparent" />
-                  <div className="absolute top-4 left-4">
-                    <div className="w-12 h-12 bg-[#4A3F35] flex items-center justify-center">
-                      <Moon className="w-6 h-6 text-[#C9A86C]" />
-                    </div>
+                  <div className="p-6 sm:p-8">
+                    <h3 className="text-xl text-[#4A3F35] mb-2" style={serif}>
+                      {l.sundayTitle}
+                    </h3>
+                    <p className="text-2xl font-semibold text-[#C9A86C] mb-1">
+                      3:00 PM — 5:00 PM
+                    </p>
+                    <p className="text-sm text-[#6B5D4D]">{l.sundayDesc}</p>
                   </div>
                 </div>
-                <div className="p-6 sm:p-8">
-                  <h3 className="text-xl text-[#4A3F35] mb-2" style={serif}>
-                    {l.wednesdayTitle}
-                  </h3>
-                  <p className="text-2xl font-semibold text-[#C9A86C] mb-1">
-                    7:30 PM — 9:00 PM
-                  </p>
-                  <p className="text-sm text-[#6B5D4D]">{l.wednesdayDesc}</p>
+              </FadeIn>
+
+              {/* Wednesday */}
+              <FadeIn delay={350}>
+                <div className="group relative overflow-hidden bg-white rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500">
+                  <div className="relative h-56 overflow-hidden">
+                    <img
+                      src="/iglesia/worship.jpg"
+                      alt={l.wednesdayTitle}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#4A3F35]/80 via-[#4A3F35]/30 to-transparent" />
+                    <div className="absolute top-4 left-4">
+                      <div className="w-12 h-12 bg-[#4A3F35] rounded-lg flex items-center justify-center">
+                        <Moon className="w-6 h-6 text-[#C9A86C]" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-6 sm:p-8">
+                    <h3 className="text-xl text-[#4A3F35] mb-2" style={serif}>
+                      {l.wednesdayTitle}
+                    </h3>
+                    <p className="text-2xl font-semibold text-[#C9A86C] mb-1">
+                      7:30 PM — 9:00 PM
+                    </p>
+                    <p className="text-sm text-[#6B5D4D]">{l.wednesdayDesc}</p>
+                  </div>
                 </div>
-              </div>
-            </FadeIn>
+              </FadeIn>
+            </div>
           </div>
+
+          <FadeIn variant="scale-in">
+            <SectionHeading label={l.servicesLabel} title={l.servicesTitle1} titleAccent={l.servicesTitle2} />
+          </FadeIn>
 
           <FadeIn className="flex items-center justify-center gap-3">
             <MapPin className="w-5 h-5 text-[#C9A86C]" />
@@ -178,8 +181,8 @@ export default function IglesiaPage() {
       {/* ═══ MINISTRIES PREVIEW ═══ */}
       <section className="py-24 md:py-32 bg-[#F5F0E8]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <FadeIn>
-            <SectionHeading label={l.ministriesLabel} title={l.ministriesTitle} />
+          <FadeIn variant="scale-in">
+            <SectionHeading label={l.ministriesLabel} title={l.ministriesTitle1} titleAccent={l.ministriesTitle2} />
           </FadeIn>
 
           <div className="grid sm:grid-cols-2 gap-6 lg:gap-8 max-w-4xl mx-auto">
@@ -189,8 +192,8 @@ export default function IglesiaPage() {
               { title: l.youthTitle, subtitle: "Zoe Zone", desc: l.youthDesc, img: "/iglesia/youth.jpg" },
               { title: l.sundaySchoolTitle, desc: l.sundaySchoolDesc, img: "/iglesia/children.jpg" },
             ].map((ministry, i) => (
-              <FadeIn key={ministry.title} delay={i * 100}>
-                <div className="group relative overflow-hidden h-72 sm:h-80 shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-500 cursor-pointer">
+              <FadeIn key={ministry.title} delay={i * 120} variant={i % 2 === 0 ? "fade-right" : "fade-left"}>
+                <div className="group relative overflow-hidden h-72 sm:h-80 rounded-xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer">
                   <img
                     src={ministry.img}
                     alt={ministry.title}
@@ -219,10 +222,102 @@ export default function IglesiaPage() {
               href="/iglesia/ministerios"
               className="inline-flex items-center gap-2 text-[#C9A86C] hover:text-[#B8956A] font-medium tracking-wide transition-colors"
             >
-              {l.eventsViewAll.replace(lang === "en" ? "Events" : "los Eventos", lang === "en" ? "Ministries" : "Ministerios")}
+              {lang === "en" ? "View All Ministries" : "Ver Todos los Ministerios"}
               <ArrowRight className="w-4 h-4" />
             </Link>
           </FadeIn>
+        </div>
+      </section>
+
+      {/* ═══ CHURCH LIFE GALLERY ═══ */}
+      <section className="py-24 md:py-32 bg-[#FAF8F5]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <FadeIn variant="scale-in">
+            <SectionHeading label={l.galleryLabel} title={l.galleryTitle1} titleAccent={l.galleryTitle2} />
+          </FadeIn>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-5xl mx-auto auto-rows-[180px] sm:auto-rows-[220px]">
+            <FadeIn delay={0} variant="scale-in" className="col-span-2 row-span-2">
+              <div className="group overflow-hidden rounded-xl h-full">
+                <img
+                  src="/iglesia/worship.jpg"
+                  alt="Worship"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+              </div>
+            </FadeIn>
+            <FadeIn delay={100} variant="fade-left">
+              <div className="group overflow-hidden rounded-xl h-full">
+                <img
+                  src="/iglesia/preaching.jpg"
+                  alt="Preaching"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+              </div>
+            </FadeIn>
+            <FadeIn delay={200} variant="fade-left">
+              <div className="group overflow-hidden rounded-xl h-full">
+                <img
+                  src="/iglesia/musicians.jpg"
+                  alt="Musicians"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+              </div>
+            </FadeIn>
+            <FadeIn delay={300} variant="fade-up">
+              <div className="group overflow-hidden rounded-xl h-full">
+                <img
+                  src="/iglesia/youth.jpg"
+                  alt="Youth"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+              </div>
+            </FadeIn>
+            <FadeIn delay={400} variant="fade-up">
+              <div className="group overflow-hidden rounded-xl h-full">
+                <img
+                  src="/iglesia/children.jpg"
+                  alt="Children"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+              </div>
+            </FadeIn>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ TESTIMONIES ═══ */}
+      <section className="py-24 md:py-32 bg-[#F5F0E8]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <FadeIn variant="scale-in">
+            <SectionHeading label={l.testimoniesLabel} title={l.testimoniesTitle} />
+          </FadeIn>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {[
+              { quote: l.testimony1Quote, name: l.testimony1Name, role: l.testimony1Role },
+              { quote: l.testimony2Quote, name: l.testimony2Name, role: l.testimony2Role },
+              { quote: l.testimony3Quote, name: l.testimony3Name, role: l.testimony3Role },
+            ].map((t, i) => (
+              <FadeIn key={i} delay={i * 150} variant="fade-up">
+                <div className="bg-white rounded-xl p-8 shadow-sm hover:shadow-lg transition-all duration-500 hover:-translate-y-2 h-full flex flex-col">
+                  <div
+                    className="text-[#C9A86C]/20 text-6xl leading-none mb-4"
+                    style={serif}
+                  >
+                    &ldquo;
+                  </div>
+                  <p className="text-[#6B5D4D] text-sm leading-relaxed flex-1 italic">
+                    {t.quote}
+                  </p>
+                  <div className="mt-6 pt-4 border-t border-[#E8E0D5]">
+                    <p className="text-[#4A3F35] font-semibold text-sm">{t.name}</p>
+                    <p className="text-[#C9A86C] text-xs tracking-wide">{t.role}</p>
+                  </div>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -235,19 +330,25 @@ export default function IglesiaPage() {
           style={{ objectPosition: "center 30%" }}
         />
         <div className="absolute inset-0 bg-[#2a1f14]/85" />
+
+        {/* Decorative blobs */}
+        <div className="absolute top-10 left-10 w-64 h-64 bg-[#C9A86C] rounded-full opacity-5" />
+        <div className="absolute bottom-10 right-10 w-48 h-48 bg-[#C9A86C] rounded-full opacity-5" />
+        <div className="absolute top-1/2 left-1/4 w-32 h-32 bg-white rounded-full opacity-5" />
+
         <FadeIn className="relative z-10 max-w-3xl mx-auto px-4 text-center">
           <h2
             className="text-3xl sm:text-4xl lg:text-5xl text-white mb-6 leading-tight"
             style={serif}
           >
-            {l.ctaTitle}
+            <span className="font-light">{l.ctaTitle}</span>
           </h2>
           <p className="text-white/70 text-base sm:text-lg leading-relaxed mb-10 max-w-2xl mx-auto">
             {l.ctaDesc}
           </p>
           <Link
             href="/iglesia/contacto"
-            className="inline-flex items-center gap-2 bg-[#C9A86C] hover:bg-[#B8956A] text-white font-medium px-10 py-4 text-sm tracking-wide transition-all shadow-lg uppercase hover:scale-105 active:scale-95"
+            className="inline-flex items-center gap-2 bg-[#C9A86C] hover:bg-[#B8956A] text-white font-medium px-10 py-4 rounded-full text-sm tracking-wide transition-all shadow-lg uppercase hover:scale-105 active:scale-95"
           >
             {l.ctaButton}
             <ArrowRight className="w-4 h-4" />

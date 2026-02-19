@@ -6,16 +6,26 @@ export function PageHero({
   image,
   label,
   title,
+  titleAccent,
+  allowOverlap = false,
 }: {
   image: string;
   label: string;
   title: string;
+  titleAccent?: string;
+  allowOverlap?: boolean;
 }) {
   return (
-    <section className="relative h-[40vh] min-h-[320px] flex items-center justify-center overflow-hidden">
+    <section
+      className={`relative flex items-center justify-center overflow-hidden ${
+        allowOverlap
+          ? "h-[50vh] min-h-[380px]"
+          : "h-[40vh] min-h-[320px]"
+      }`}
+    >
       <img
         src={image}
-        alt={title}
+        alt={titleAccent ? `${title} ${titleAccent}` : title}
         className="absolute inset-0 w-full h-full object-cover"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-[#2a1f14]/60 via-[#1a1510]/50 to-[#0f0c08]/70" />
@@ -27,7 +37,14 @@ export function PageHero({
           className="text-3xl sm:text-4xl lg:text-5xl text-white"
           style={serif}
         >
-          {title}
+          {titleAccent ? (
+            <>
+              <span className="font-light">{title}</span>{" "}
+              <span className="font-bold">{titleAccent}</span>
+            </>
+          ) : (
+            title
+          )}
         </h1>
         <div className="w-16 h-0.5 bg-[#C9A86C] mx-auto mt-6" />
       </div>

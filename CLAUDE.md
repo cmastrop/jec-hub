@@ -26,9 +26,13 @@ src/
   middleware.ts           # Auth middleware + church domain rewrite
   app/
     page.tsx              # Landing page JEC Hub (split-screen, features, CTAs)
-    iglesia/             # Pagina publica de la iglesia (jesuseselcamino.com.au)
-      layout.tsx         # Layout con Playfair Display font + SEO metadata
-      page.tsx           # Single-page bilingue (EN/ES): hero, servicios, vision, mision, ministerios, pastores, contacto con formulario
+    iglesia/             # Pagina publica de la iglesia (jesuseselcamino.com.au) — multi-pagina
+      layout.tsx         # Layout con Playfair Display font + SEO metadata + ChurchShell wrapper
+      page.tsx           # Homepage: hero + servicios + ministerios preview + CTA
+      nosotros/page.tsx  # About: vision (3 pilares), mision, pastores
+      ministerios/page.tsx # Ministerios: grid completo de ministerios
+      eventos/page.tsx   # Eventos: calendario publico + lista de eventos
+      contacto/page.tsx  # Contacto: info + formulario de contacto
     (auth)/              # Layout de autenticacion (login/registro)
       layout.tsx         # Split layout con imagen de adoracion + form
       login/page.tsx     # Pagina de login
@@ -94,6 +98,13 @@ src/
       file-upload.tsx            # Componente upload con selector AI provider
     setlist/
       song-search-modal.tsx      # Modal busqueda canciones para agregar a setlist
+    iglesia/                       # Componentes compartidos pagina iglesia
+      church-shell.tsx             # Client wrapper: LangContext provider + header + footer
+      church-header.tsx            # Sticky nav con Link a sub-paginas, transparent/opaque segun pathname
+      church-footer.tsx            # Footer con traducciones bilingues
+      fade-in.tsx                  # Scroll animations: fade-up, fade-left, fade-right, scale-in (CSS + IntersectionObserver)
+      page-hero.tsx                # Banner 40vh para sub-paginas (imagen + label + titulo)
+      section-heading.tsx          # Label + titulo + divisor reutilizable (soporta modo light/dark)
     migration/
       dropbox-migration.tsx      # Componente migracion Dropbox (fases: conectar/catalogar/descargar/procesar)
       migration-progress.tsx     # Barra de progreso con errores
@@ -124,10 +135,14 @@ src/
       client.ts          # Supabase browser client
       server.ts          # Supabase server client (SSR) — exporta createClient()
       admin.ts           # Supabase admin client (service role, bypasses RLS)
+    iglesia/
+      types.ts           # Lang type ("en" | "es"), LangContextValue interface
+      translations.ts    # 105+ translation keys EN/ES (toda la pagina iglesia)
+      use-lang.ts        # React Context + useLang() hook
     migration/
       utils.ts           # RateLimiter, getFileType, toStoragePath, isProcessableByGemini
     types/
-      database.ts        # Song, Profile, Setlist, SetlistSong, ImportJob, ImportItem, DropboxToken, MigratedFile
+      database.ts        # Song, Profile, Setlist, SetlistSong, ImportJob, ImportItem, DropboxToken, MigratedFile, ChurchEvent
   hooks/
     use-user.ts          # Hook para perfil/rol del usuario (cached, clearUserCache)
 scripts/
@@ -288,6 +303,7 @@ Permisos:
 - Gestionar usuarios y roles (/equipo)
 - Crear, editar y eliminar programas de culto
 - Agregar/quitar/reordenar canciones en programas
+- **Gestionar eventos de la iglesia**: crear/editar/eliminar eventos, flujo de aprobacion (draft → approved → published)
 
 ### Miembro (usuario comun)
 Permisos:
@@ -368,38 +384,74 @@ Permisos:
 - Soporta: JPG, PNG, WebP, PDF (max 10MB)
 - Crea borrador, redirect al editor
 
-### Calendario Publico de Eventos (`/iglesia` section + API)
-- Seccion de calendario en la pagina de la iglesia (entre Pastores y Contacto)
-- **API publica**: `GET /api/events` retorna solo eventos con `status: "published"`
-- **API admin**: `POST /api/events`, `PATCH/DELETE /api/events/[id]` requieren rol admin
-- **Grilla mensual**: navegacion por mes, badges de eventos coloreados por tipo
-- **Lista de eventos**: cards con fecha, hora, ubicacion, descripcion
-- **Google Calendar**: link para agregar cada evento al calendario de Google
-- **Flujo de aprobacion**: admin crea evento (draft) → aprueba → publica
-- **Tipos de evento**: service (gold), youth (verde), prayer (violeta), special (rojo), community (azul), conference (naranja)
-- **Bilingue**: traducciones completas EN/ES para meses, dias, labels
-- **Estado vacio**: icono de calendario + mensaje "no hay eventos" cuando no hay datos
-- **Tabla creada**: `church_events` en Supabase (ya existe en produccion)
+### Eventos de la Iglesia (Publico + Admin)
 
-### Pagina Publica de la Iglesia (`/iglesia`)
+**Pagina publica** (`/iglesia/eventos`):
+- Calendario mensual con badges coloreados por tipo de evento
+- Lista de eventos con fecha, hora, ubicacion, descripcion
+- Link para agregar cada evento a Google Calendar
+- Solo muestra eventos con `status: "published"`
+- Bilingue EN/ES (meses, dias, labels)
+
+**Pagina admin** (`/(app)/eventos`):
+- CRUD completo de eventos con formulario inline
+- Filtros por estado: todos / borrador / aprobado / publicado
+- **Flujo de aprobacion**: crear (draft) → aprobar (approved) → publicar (published)
+- EventCards expandibles con acciones: editar, publicar/despublicar, eliminar
+- Solo accesible por admins (guard con `useUser()` + `isAdmin`)
+
+**API** (`/api/events`):
+- `GET /api/events?from=&to=` — publico, retorna solo eventos published
+- `GET /api/events?all=true` — admin, retorna todos los eventos
+- `POST /api/events` — admin, crear evento
+- `PATCH /api/events/[id]` — admin, editar evento
+- `DELETE /api/events/[id]` — admin, eliminar evento
+
+**Tipos de evento**: service (gold `#C9A86C`), youth (verde `#6B8E23`), prayer (violeta `#8B5CF6`), special (rojo `#E74C3C`), community (azul `#3498DB`), conference (naranja `#E67E22`)
+- **Tabla**: `church_events` en Supabase (ya existe en produccion)
+
+### Pagina Publica de la Iglesia (`/iglesia` — multi-pagina)
 - Accesible en `jesuseselcamino.com.au` (middleware rewrite) y `hub.../iglesia` (directo)
-- **Bilingue**: toggle EN/ES en header, traduce TODO el contenido incluido nombre de la iglesia
+- **Arquitectura multi-pagina**: cada seccion tiene su propia ruta con `Link` navigation
+- **Bilingue**: toggle EN/ES en header, React Context (`LangContext`) persiste idioma durante client-side navigation
 - **EN**: "Jesus Is The Way" / **ES**: "Jesus Es El Camino"
-- Secciones: Hero → Servicios → Vision (3 pilares) → Mision → Ministerios (4 cards) → Pastores → Eventos → Contacto → Footer
-- **Hero**: full-screen con foto, logo, nombre iglesia, CTA, scroll indicator
-- **Servicios**: Domingo 3-5PM + Miercoles 7:30-9PM con fotos, link Google Maps
-- **Vision**: 3 pilares (Equipar/Enviar/Alcanzar) con iconos y cards
-- **Mision**: "Hacer Discipulos para Cristo" con parallax background
+
+**Rutas:**
+| Ruta | Contenido |
+|------|-----------|
+| `/iglesia` | Homepage: hero + servicios + ministerios preview + CTA |
+| `/iglesia/nosotros` | Vision (3 pilares) + Mision + Pastores |
+| `/iglesia/ministerios` | Grid completo de ministerios (4 cards) |
+| `/iglesia/eventos` | Calendario publico + lista de eventos |
+| `/iglesia/contacto` | Info de contacto + formulario |
+| `/iglesia/testimonios` | (futuro — link en nav) |
+| `/iglesia/donar` | (futuro — link en nav) |
+
+**Componentes compartidos** (`src/components/iglesia/`):
+- `ChurchShell`: wrapper con LangContext provider + header + footer (en `layout.tsx`)
+- `ChurchHeader`: sticky nav con `usePathname()` — transparente en homepage, opaco en sub-paginas. Mobile menu con framer-motion AnimatePresence.
+- `ChurchFooter`: footer con traducciones bilingues
+- `FadeIn`: scroll animations con IntersectionObserver + CSS transitions. Variantes: `fade-up`, `fade-left`, `fade-right`, `scale-in`. Prop `delay` para stagger.
+- `PageHero`: banner 40vh para sub-paginas (imagen + label + titulo)
+- `SectionHeading`: label + titulo + divisor reutilizable
+
+**Contenido por pagina:**
+- **Homepage**: hero full-screen, servicios (Domingo 3-5PM + Miercoles 7:30-9PM), ministerios preview, CTA
+- **Nosotros**: 3 pilares (Equipar/Enviar/Alcanzar), mision con parallax, pastores con stats
 - **Ministerios**: 4 cards (Hombres, Mujeres, Jovenes "Zoe Zone", Escuela Dominical) con fotos overlay
-- **Pastores**: Pastor Morris & Daisy Velasquez, foto, bio, stats (35+ anos, 2 idiomas)
-- **Contacto**: info (telefonos, email) + ubicacion (Google Maps) + formulario de contacto (mailto)
-- **Formulario de contacto**: nombre, email, telefono (opcional), mensaje → abre mail client
-- **Header sticky**: transparente sobre hero, solido con blur al scrollear
-- **Mobile menu**: slide-in drawer con framer-motion (AnimatePresence)
-- **Animaciones**: FadeInOnScroll con IntersectionObserver + CSS transitions (NO framer-motion para evitar SSR blank)
+- **Eventos**: calendario mensual con badges coloreados, lista de eventos, Google Calendar links
+- **Contacto**: telefonos, email, direccion, Google Maps link, formulario mailto
+
+**Diseno:**
 - **Paleta**: parchment `#FAF8F5`, gold `#C9A86C`, dark brown `#4A3F35`, medium `#6B5D4D`
 - **Fuente**: Playfair Display (serif) para titulos, Geist (sans) heredado del root layout
+- **Animaciones**: CSS + IntersectionObserver (NO framer-motion para contenido — causa SSR blank)
+- **framer-motion**: SOLO para mobile menu AnimatePresence
 - Imagenes en `public/iglesia/` (hero, pastores, ministerios, worship, etc.)
+
+**Traducciones** (`src/lib/iglesia/translations.ts`):
+- 105+ keys organizados por seccion (nav, hero, services, vision, mission, ministries, pastors, events, contact, footer)
+- `useLang()` hook retorna `{ lang, setLang, toggleLang }`
 
 ### Landing Page JEC Hub (`/`)
 - Diseno split-screen igual que login (imagen de adoracion a la izquierda)
@@ -444,6 +496,13 @@ Permisos:
 
 - Archivo: `src/middleware.ts`
 - **Church domain detection**: `jesuseselcamino.com.au` / `www.` → rewrite a `/iglesia` (URL limpia)
+- **Sub-route rewriting**: church domain + sub-rutas conocidas → rewrite a `/iglesia/*`
+  - `/nosotros` → `/iglesia/nosotros`
+  - `/ministerios` → `/iglesia/ministerios`
+  - `/eventos` → `/iglesia/eventos`
+  - `/contacto` → `/iglesia/contacto`
+  - `/testimonios` → `/iglesia/testimonios` (futuro)
+  - `/donar` → `/iglesia/donar` (futuro)
 - Rutas `/iglesia` siempre publicas (sin auth, sin importar dominio)
 - Rutas publicas (sin auth): `/`, `/login`, `/registro`, `/api/*`
 - Unauthenticated → redirige a `/login`
@@ -492,14 +551,20 @@ JEC Hub evolucionara a **JEC Platform** — plataforma centralizada de la iglesi
 ### Fase 1: Consolidacion (en progreso)
 - [x] Apuntar `jesuseselcamino.com.au` a Vercel (dominio raiz + www)
 - [x] Pagina publica de la iglesia bilingue (`/iglesia`) con formulario de contacto
-- [x] Middleware domain routing (church domain → `/iglesia`)
+- [x] Middleware domain routing (church domain → `/iglesia` + sub-rutas)
+- [x] Arquitectura multi-pagina iglesia (homepage, nosotros, ministerios, eventos, contacto)
+- [x] Scroll animations con FadeIn (fade-up, fade-left, fade-right, scale-in)
+- [x] Componentes compartidos iglesia (ChurchShell, ChurchHeader, ChurchFooter, PageHero, etc.)
+- [x] Sistema de traducciones bilingue con React Context (LangProvider)
+- [x] Gestion de eventos iglesia (admin: CRUD + flujo aprobacion)
 - [ ] Dashboard post-login con acceso a ministerios
 - [ ] Mover rutas de musica bajo `/musica/*`
 
-### Fase 2: Multi-idioma
-- [ ] Soporte Espanol/Ingles
+### Fase 2: Multi-idioma (parcialmente completado para iglesia)
+- [x] Soporte Espanol/Ingles en pagina iglesia (105+ keys)
+- [ ] Soporte Espanol/Ingles en plataforma hub
 - [ ] Preferencia de idioma en perfil de usuario
-- [ ] ~24 archivos con texto hardcodeado en espanol para traducir
+- [ ] ~24 archivos hub con texto hardcodeado en espanol para traducir
 
 ### Fase 3: Seguridad avanzada
 - [ ] Verificacion de email (Supabase lo soporta nativamente)
