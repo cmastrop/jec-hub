@@ -14,11 +14,20 @@ export async function middleware(request: NextRequest) {
     hostname === "jesuseselcamino.com.au" ||
     hostname === "www.jesuseselcamino.com.au";
 
+  // Church sub-routes that get rewritten to /iglesia/*
+  const churchSubRoutes = ["/nosotros", "/ministerios", "/eventos", "/contacto", "/testimonios", "/donar"];
+
   if (isChurchDomain) {
     // Root path → rewrite to /iglesia (URL stays clean)
     if (request.nextUrl.pathname === "/") {
       const url = request.nextUrl.clone();
       url.pathname = "/iglesia";
+      return NextResponse.rewrite(url);
+    }
+    // Rewrite known church sub-routes (e.g. /nosotros → /iglesia/nosotros)
+    if (churchSubRoutes.some((r) => request.nextUrl.pathname === r || request.nextUrl.pathname.startsWith(r + "/"))) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/iglesia" + request.nextUrl.pathname;
       return NextResponse.rewrite(url);
     }
     // Allow /iglesia routes through without auth

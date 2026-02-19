@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Playfair_Display } from "next/font/google";
+import { ChurchShell } from "@/components/iglesia/church-shell";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -24,5 +25,9 @@ export default function IglesiaLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className={playfair.variable}>{children}</div>;
+  return (
+    <div className={playfair.variable}>
+      <ChurchShell>{children}</ChurchShell>
+    </div>
+  );
 }

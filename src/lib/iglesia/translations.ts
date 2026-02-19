@@ -1,0 +1,229 @@
+export const translations = {
+  en: {
+    // Navigation
+    navHome: "Home",
+    navAbout: "About Us",
+    navMinistries: "Ministries",
+    navEvents: "Events",
+    navContact: "Contact",
+    // Hero
+    heroLabel: "Welcome to",
+    heroSubtitle: "You Are Welcome Here",
+    heroDesc1:
+      "A multicultural Spanish and English-speaking church that seeks to make faithful followers of Christ",
+    heroDesc2:
+      "Jesús es el Camino es una iglesia multicultural de habla Hispana e Inglés que busca hacer fieles seguidores de Cristo",
+    heroCta: "Join Us This Sunday",
+    // Services
+    servicesLabel: "Join Us",
+    servicesTitle: "Service Times",
+    sundayTitle: "Sunday Service",
+    sundayDesc: "Worship, Word & Fellowship",
+    wednesdayTitle: "Wednesday Night",
+    wednesdayDesc: "Prayer & Bible Study",
+    // Vision
+    visionLabel: "Nuestra Visión",
+    visionTitle: "Our Vision",
+    equipTitle: "EQUIP",
+    equipDesc:
+      "We seek to equip newcomers with the tools to become devoted disciples of Christ, using biblical teachings within the church or through discipleship groups.",
+    sendTitle: "SEND",
+    sendDesc:
+      "Our objective is to send committed followers to society once they have developed the habit and discipline of being faithful and mature disciples of Christ.",
+    reachTitle: "REACH",
+    reachDesc:
+      "Our goal is to reach those people who have not yet embraced the gospel. We aim to achieve this through gospel preachings and acts of love.",
+    // Mission
+    missionLabel: "Our Mission",
+    missionLine1: "Create Disciples",
+    missionLine2: "for Christ",
+    missionSubtitle: "Hacer Discípulos para Cristo",
+    missionDesc1:
+      "The mission of the church is to make disciples for Christ, welcoming them into the kingdom and guiding them to embrace and follow Jesus' commandments.",
+    missionDesc2:
+      "La misión de la iglesia es hacer discípulos para Cristo, dándoles la bienvenida al reino y guiándolos a aceptar y seguir los mandamientos de Jesús.",
+    // Ministries
+    ministriesLabel: "Nuestros Ministerios",
+    ministriesTitle: "Our Ministries",
+    ministryTag: "Ministry",
+    mensTitle: "Men's Group",
+    mensDesc:
+      "Bringing brothers in Christ together through fellowship, accountability, and discipleship.",
+    womensTitle: "Women's Group",
+    womensDesc:
+      "Bringing women in Christ together to grow in faith, support, and sisterhood.",
+    youthTitle: "Youth Group",
+    youthDesc:
+      "Empowering high school aged children and older to live out their faith boldly.",
+    sundaySchoolTitle: "Sunday School",
+    sundaySchoolDesc:
+      "Teaching the youngest members of our church the love of God through engaging lessons.",
+    // Pastors
+    pastorsLabel: "Nuestros Pastores",
+    pastorsTitle: "Our Pastors",
+    pastorsDesc1:
+      "Pastor Morris and Daisy have been faithfully serving the community since 1990, leading with love and dedication.",
+    pastorsDesc2:
+      "Their vision has built a vibrant multicultural church family that welcomes people from all walks of life, bringing together Spanish and English speakers in worship and fellowship.",
+    statYears: "Years of Service",
+    statLanguages: "Languages",
+    statFamily: "Family",
+    // Contact
+    contactLabel: "Contáctanos",
+    contactTitle: "Get in Touch",
+    contactUs: "Contact Us",
+    findUs: "Find Us",
+    address: "Address",
+    email: "Email",
+    openMaps: "Open in Google Maps",
+    // Footer
+    footerChurch: "Spanish & English-Speaking Church",
+    footerPlatform: "Ministry Platform",
+    mobileSunday: "Sunday 3:00 PM — 5:00 PM",
+    // Church name
+    churchName: "Jesus Is The Way",
+    heroLine1: "Jesus Is The",
+    heroAccent: "Way",
+    // Contact form
+    formTitle: "Send Us a Message",
+    formName: "Full Name",
+    formEmail: "Email",
+    formPhone: "Phone (optional)",
+    formMessage: "Message",
+    formSubmit: "Send Message",
+    formSending: "Sending...",
+    formSuccess: "Message sent! We'll get back to you soon.",
+    formNamePh: "Your name",
+    formEmailPh: "your@email.com",
+    formPhonePh: "0400 000 000",
+    formMessagePh: "How can we help you?",
+    // Events
+    eventsLabel: "What's Happening",
+    eventsTitle: "Upcoming Events",
+    eventsEmpty: "No upcoming events at this time. Check back soon!",
+    eventsAddCal: "Add to Calendar",
+    eventsViewAll: "View All Events",
+    eventsMonths: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+    eventsDays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    eventsToday: "Today",
+    // About page
+    aboutLabel: "Our Story",
+    aboutTitle: "About Us",
+    aboutHeroDesc: "Get to know our church, our vision, and the people who lead us.",
+    // Ministries page
+    ministriesHeroDesc: "Discover the different ways you can connect and grow with us.",
+    // Events page
+    eventsHeroDesc: "Stay up to date with what's happening at our church.",
+    // Contact page
+    contactHeroDesc: "We'd love to hear from you. Reach out anytime.",
+    // CTA
+    ctaTitle: "Join Us This Sunday",
+    ctaDesc: "Experience the love of God in a vibrant, multicultural community. Everyone is welcome.",
+    ctaButton: "Get in Touch",
+  },
+  es: {
+    navHome: "Inicio",
+    navAbout: "Nosotros",
+    navMinistries: "Ministerios",
+    navEvents: "Eventos",
+    navContact: "Contacto",
+    heroLabel: "Bienvenidos a",
+    heroSubtitle: "Eres Bienvenido Aquí",
+    heroDesc1:
+      "Jesús es el Camino es una iglesia multicultural de habla Hispana e Inglés que busca hacer fieles seguidores de Cristo",
+    heroDesc2:
+      "A multicultural Spanish and English-speaking church that seeks to make faithful followers of Christ",
+    heroCta: "Acompáñanos Este Domingo",
+    servicesLabel: "Acompáñanos",
+    servicesTitle: "Horarios de Servicios",
+    sundayTitle: "Servicio Dominical",
+    sundayDesc: "Adoración, Palabra y Comunión",
+    wednesdayTitle: "Miércoles en la Noche",
+    wednesdayDesc: "Oración y Estudio Bíblico",
+    visionLabel: "Our Vision",
+    visionTitle: "Nuestra Visión",
+    equipTitle: "EQUIPAR",
+    equipDesc:
+      "Buscamos equipar a los recién llegados con las herramientas para convertirse en discípulos devotos de Cristo, utilizando enseñanzas bíblicas dentro de la iglesia o a través de grupos de discipulado.",
+    sendTitle: "ENVIAR",
+    sendDesc:
+      "Nuestro objetivo es enviar seguidores comprometidos a la sociedad una vez que hayan desarrollado el hábito y la disciplina de ser discípulos fieles y maduros de Cristo.",
+    reachTitle: "ALCANZAR",
+    reachDesc:
+      "Nuestra meta es alcanzar a aquellas personas que aún no han aceptado el evangelio. Buscamos lograrlo a través de la predicación del evangelio y actos de amor.",
+    missionLabel: "Nuestra Misión",
+    missionLine1: "Hacer Discípulos",
+    missionLine2: "para Cristo",
+    missionSubtitle: "Create Disciples for Christ",
+    missionDesc1:
+      "La misión de la iglesia es hacer discípulos para Cristo, dándoles la bienvenida al reino y guiándolos a aceptar y seguir los mandamientos de Jesús.",
+    missionDesc2:
+      "The mission of the church is to make disciples for Christ, welcoming them into the kingdom and guiding them to embrace and follow Jesus' commandments.",
+    ministriesLabel: "Our Ministries",
+    ministriesTitle: "Nuestros Ministerios",
+    ministryTag: "Ministerio",
+    mensTitle: "Grupo de Hombres",
+    mensDesc:
+      "Uniendo a hermanos en Cristo a través de la comunión, la responsabilidad mutua y el discipulado.",
+    womensTitle: "Grupo de Mujeres",
+    womensDesc:
+      "Uniendo a mujeres en Cristo para crecer en fe, apoyo y hermandad.",
+    youthTitle: "Grupo de Jóvenes",
+    youthDesc:
+      "Empoderando a jóvenes de secundaria y mayores para vivir su fe con valentía.",
+    sundaySchoolTitle: "Escuela Dominical",
+    sundaySchoolDesc:
+      "Enseñando a los miembros más jóvenes de nuestra iglesia el amor de Dios a través de lecciones dinámicas.",
+    pastorsLabel: "Our Pastors",
+    pastorsTitle: "Nuestros Pastores",
+    pastorsDesc1:
+      "El Pastor Morris y Daisy han servido fielmente a la comunidad desde 1990, liderando con amor y dedicación.",
+    pastorsDesc2:
+      "Su visión ha construido una vibrante familia eclesiástica multicultural que da la bienvenida a personas de todos los ámbitos de la vida, uniendo a hispanohablantes e angloparlantes en adoración y comunión.",
+    statYears: "Años de Servicio",
+    statLanguages: "Idiomas",
+    statFamily: "Familia",
+    contactLabel: "Get in Touch",
+    contactTitle: "Contáctanos",
+    contactUs: "Contáctanos",
+    findUs: "Encuéntranos",
+    address: "Dirección",
+    email: "Correo",
+    openMaps: "Abrir en Google Maps",
+    footerChurch: "Iglesia de Habla Hispana e Inglés",
+    footerPlatform: "Plataforma del Ministerio",
+    mobileSunday: "Domingo 3:00 PM — 5:00 PM",
+    churchName: "Jesús Es El Camino",
+    heroLine1: "Jesús Es El",
+    heroAccent: "Camino",
+    formTitle: "Envíanos un Mensaje",
+    formName: "Nombre Completo",
+    formEmail: "Correo Electrónico",
+    formPhone: "Teléfono (opcional)",
+    formMessage: "Mensaje",
+    formSubmit: "Enviar Mensaje",
+    formSending: "Enviando...",
+    formSuccess: "¡Mensaje enviado! Nos pondremos en contacto pronto.",
+    formNamePh: "Tu nombre",
+    formEmailPh: "tu@correo.com",
+    formPhonePh: "0400 000 000",
+    formMessagePh: "¿En qué podemos ayudarte?",
+    eventsLabel: "Lo Que Viene",
+    eventsTitle: "Próximos Eventos",
+    eventsEmpty: "No hay eventos próximos en este momento. ¡Vuelve pronto!",
+    eventsAddCal: "Agregar al Calendario",
+    eventsViewAll: "Ver Todos los Eventos",
+    eventsMonths: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+    eventsDays: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"],
+    eventsToday: "Hoy",
+    aboutLabel: "Nuestra Historia",
+    aboutTitle: "Nosotros",
+    aboutHeroDesc: "Conoce nuestra iglesia, nuestra visión y quienes nos lideran.",
+    ministriesHeroDesc: "Descubre las diferentes formas en que puedes conectarte y crecer con nosotros.",
+    eventsHeroDesc: "Mantente al día con lo que está pasando en nuestra iglesia.",
+    contactHeroDesc: "Nos encantaría saber de ti. Escríbenos cuando quieras.",
+    ctaTitle: "Acompáñanos Este Domingo",
+    ctaDesc: "Experimenta el amor de Dios en una comunidad vibrante y multicultural. Todos son bienvenidos.",
+    ctaButton: "Contáctanos",
+  },
+};
