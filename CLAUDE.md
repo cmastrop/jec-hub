@@ -32,7 +32,10 @@ src/
       nosotros/page.tsx  # About: vision (3 pilares), mision, pastores
       ministerios/page.tsx # Ministerios: grid completo de ministerios
       eventos/page.tsx   # Eventos: calendario publico + lista de eventos
-      contacto/page.tsx  # Contacto: info + formulario de contacto
+      contacto/page.tsx  # Contacto: 3 info cards overlapping + formulario
+      sermones/page.tsx  # Sermones: featured + grid 3x2 con play overlays
+      testimonios/page.tsx # Testimonios: cards con fotos + CTA compartir
+      donar/page.tsx     # Donar: scripture + 2-col (formas de dar + impacto)
     (auth)/              # Layout de autenticacion (login/registro)
       layout.tsx         # Split layout con imagen de adoracion + form
       login/page.tsx     # Pagina de login
@@ -100,10 +103,10 @@ src/
       song-search-modal.tsx      # Modal busqueda canciones para agregar a setlist
     iglesia/                       # Componentes compartidos pagina iglesia
       church-shell.tsx             # Client wrapper: LangContext provider + header + footer
-      church-header.tsx            # Sticky nav con Link a sub-paginas, transparent/opaque segun pathname
+      church-header.tsx            # Sticky nav con 7 links + Give CTA dorado, transparent/opaque segun pathname
       church-footer.tsx            # Footer con traducciones bilingues
       fade-in.tsx                  # Scroll animations: fade-up, fade-left, fade-right, scale-in (CSS + IntersectionObserver)
-      page-hero.tsx                # Banner 40vh para sub-paginas (imagen + label + titulo)
+      page-hero.tsx                # Banner 40vh para sub-paginas (imagen + label + titulo + titleAccent + allowOverlap)
       section-heading.tsx          # Label + titulo + divisor reutilizable (soporta modo light/dark)
     migration/
       dropbox-migration.tsx      # Componente migracion Dropbox (fases: conectar/catalogar/descargar/procesar)
@@ -423,16 +426,17 @@ Permisos:
 | `/iglesia/nosotros` | Vision (3 pilares) + Mision + Pastores |
 | `/iglesia/ministerios` | Grid completo de ministerios (4 cards) |
 | `/iglesia/eventos` | Calendario publico + lista de eventos |
-| `/iglesia/contacto` | Info de contacto + formulario |
-| `/iglesia/testimonios` | (futuro — link en nav) |
-| `/iglesia/donar` | (futuro — link en nav) |
+| `/iglesia/contacto` | 3 info cards overlapping hero + formulario dark section |
+| `/iglesia/sermones` | Featured sermon overlapping + grid 3x2 con play overlays + series badges |
+| `/iglesia/testimonios` | Cards con fotos + categorias + CTA "compartir testimonio" |
+| `/iglesia/donar` | Scripture quote + 2-col (formas de dar + impacto) + bank details |
 
 **Componentes compartidos** (`src/components/iglesia/`):
 - `ChurchShell`: wrapper con LangContext provider + header + footer (en `layout.tsx`)
-- `ChurchHeader`: sticky nav con `usePathname()` — transparente en homepage, opaco en sub-paginas. Mobile menu con framer-motion AnimatePresence.
+- `ChurchHeader`: sticky nav con 7 links (Home, Nosotros, Ministerios, Sermones, Eventos, Testimonios, Contacto) + boton Give/Donar dorado con icono Heart. Transparente en homepage, opaco en sub-paginas. Mobile menu con framer-motion AnimatePresence.
 - `ChurchFooter`: footer con traducciones bilingues
 - `FadeIn`: scroll animations con IntersectionObserver + CSS transitions. Variantes: `fade-up`, `fade-left`, `fade-right`, `scale-in`. Prop `delay` para stagger.
-- `PageHero`: banner 40vh para sub-paginas (imagen + label + titulo)
+- `PageHero`: banner 40vh para sub-paginas (imagen + label + titulo). Props opcionales: `titleAccent` (dual-weight), `allowOverlap` (permite cards con `-mt-20`)
 - `SectionHeading`: label + titulo + divisor reutilizable
 
 **Contenido por pagina:**
@@ -440,17 +444,20 @@ Permisos:
 - **Nosotros**: 3 pilares (Equipar/Enviar/Alcanzar), mision con parallax, pastores con stats
 - **Ministerios**: 4 cards (Hombres, Mujeres, Jovenes "Zoe Zone", Escuela Dominical) con fotos overlay
 - **Eventos**: calendario mensual con badges coloreados, lista de eventos, Google Calendar links
-- **Contacto**: telefonos, email, direccion, Google Maps link, formulario mailto
+- **Contacto**: 3 cards equal-height overlapping hero (telefono, email, direccion), formulario dark section con mailto
+- **Sermones**: featured sermon overlapping hero (2-col: imagen con play button + contenido), grid 3x2 con hover play overlay, series badge, metadata (speaker/date/duration)
+- **Testimonios**: quote intro section, grid 3x2 cards con fotos (aspect-[4/3]), category labels, "Read More →", CTA dark "Your Story Matters"
+- **Donar**: scripture quote (italic serif), 2-col layout: izq (3 formas de dar con iconos + bank details) / der (4 impact cards + dark thank-you box)
 
 **Diseno:**
 - **Paleta**: parchment `#FAF8F5`, gold `#C9A86C`, dark brown `#4A3F35`, medium `#6B5D4D`
 - **Fuente**: Playfair Display (serif) para titulos, Geist (sans) heredado del root layout
 - **Animaciones**: CSS + IntersectionObserver (NO framer-motion para contenido — causa SSR blank)
 - **framer-motion**: SOLO para mobile menu AnimatePresence
-- Imagenes en `public/iglesia/` (hero, pastores, ministerios, worship, etc.)
+- Imagenes en `public/iglesia/` (23 archivos: hero, pastores, ministerios, worship, 6 sermon-*.jpg, 6 testimony-*.jpg de Pexels, etc.)
 
 **Traducciones** (`src/lib/iglesia/translations.ts`):
-- 105+ keys organizados por seccion (nav, hero, services, vision, mission, ministries, pastors, events, contact, footer)
+- 185+ keys organizados por seccion (nav, hero, services, vision, mission, ministries, pastors, events, contact, footer, sermons, testimonies, giving)
 - `useLang()` hook retorna `{ lang, setLang, toggleLang }`
 
 ### Landing Page JEC Hub (`/`)
@@ -501,8 +508,9 @@ Permisos:
   - `/ministerios` → `/iglesia/ministerios`
   - `/eventos` → `/iglesia/eventos`
   - `/contacto` → `/iglesia/contacto`
-  - `/testimonios` → `/iglesia/testimonios` (futuro)
-  - `/donar` → `/iglesia/donar` (futuro)
+  - `/testimonios` → `/iglesia/testimonios`
+  - `/donar` → `/iglesia/donar`
+  - `/sermones` → `/iglesia/sermones`
 - Rutas `/iglesia` siempre publicas (sin auth, sin importar dominio)
 - Rutas publicas (sin auth): `/`, `/login`, `/registro`, `/api/*`
 - Unauthenticated → redirige a `/login`
@@ -548,7 +556,7 @@ Permisos:
 ### Vision
 JEC Hub evolucionara a **JEC Platform** — plataforma centralizada de la iglesia accesible desde `jesuseselcamino.com.au`. Multiples ministerios como modulos independientes con autenticacion unificada.
 
-### Fase 1: Consolidacion (en progreso)
+### Fase 1: Consolidacion (completada)
 - [x] Apuntar `jesuseselcamino.com.au` a Vercel (dominio raiz + www)
 - [x] Pagina publica de la iglesia bilingue (`/iglesia`) con formulario de contacto
 - [x] Middleware domain routing (church domain → `/iglesia` + sub-rutas)
@@ -557,26 +565,32 @@ JEC Hub evolucionara a **JEC Platform** — plataforma centralizada de la iglesi
 - [x] Componentes compartidos iglesia (ChurchShell, ChurchHeader, ChurchFooter, PageHero, etc.)
 - [x] Sistema de traducciones bilingue con React Context (LangProvider)
 - [x] Gestion de eventos iglesia (admin: CRUD + flujo aprobacion)
+- [x] Visual upgrade estilo Base44 (overlapping cards, dual-weight headings, pill buttons, gallery, 4-col footer)
+- [x] Paginas sermones, testimonios y donar (Base44 design, fotos stock de Pexels)
+- [x] Nav completo: 7 links + boton Give/Donar con Heart icon
+
+### Fase 2: Pendiente — Mejoras iglesia
+- [ ] Sermones: conectar a YouTube real (actualmente botones no linkean)
+- [ ] Testimonios: conectar a datos reales (actualmente placeholders estaticos)
+- [ ] Testimonios: pagina individual por testimonio (click "Read More" no navega)
+- [ ] Donar: agregar datos bancarios reales (BSB + Account actualmente "—")
+- [ ] Donar: integrar plataforma de pagos online (Stripe/PayPal)
+- [ ] Contacto: backend real para formulario (actualmente usa mailto)
+- [ ] Fotos reales de la iglesia (reemplazar stock photos de Pexels por fotos propias)
+- [ ] SEO: meta tags por pagina, OpenGraph images, sitemap.xml
+- [ ] Performance: Next.js Image component (actualmente usa `<img>` tags)
+
+### Fase 3: Plataforma hub
 - [ ] Dashboard post-login con acceso a ministerios
 - [ ] Mover rutas de musica bajo `/musica/*`
-
-### Fase 2: Multi-idioma (parcialmente completado para iglesia)
-- [x] Soporte Espanol/Ingles en pagina iglesia (105+ keys)
-- [ ] Soporte Espanol/Ingles en plataforma hub
+- [ ] Soporte Espanol/Ingles en plataforma hub (~24 archivos)
 - [ ] Preferencia de idioma en perfil de usuario
-- [ ] ~24 archivos hub con texto hardcodeado en espanol para traducir
 
-### Fase 3: Seguridad avanzada
+### Fase 4: Seguridad avanzada
 - [ ] Verificacion de email (Supabase lo soporta nativamente)
 - [ ] Verificacion de mobile (SMS via Supabase + Twilio)
 
-### Fase 4: Nuevos ministerios
+### Fase 5: Nuevos ministerios
 - [ ] Panel Ministerio Pastoral
 - [ ] Panel Ministerio de Jovenes
 - [ ] Sistema de roles por ministerio (admin de musica vs admin pastoral)
-
-### Fase 5: Rediseno profesional
-- [ ] Redesign completo de la web publica
-- [ ] Branding unificado
-- [ ] Responsive optimizado
-- [ ] SEO y performance
