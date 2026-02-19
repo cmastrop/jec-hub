@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, Globe } from "lucide-react";
+import { Menu, X, Globe, Heart } from "lucide-react";
 import { useLang } from "@/lib/iglesia/use-lang";
 import { translations } from "@/lib/iglesia/translations";
 
@@ -14,7 +14,9 @@ const navItems = [
   { key: "navHome", href: "/iglesia" },
   { key: "navAbout", href: "/iglesia/nosotros" },
   { key: "navMinistries", href: "/iglesia/ministerios" },
+  { key: "navSermons", href: "/iglesia/sermones" },
   { key: "navEvents", href: "/iglesia/eventos" },
+  { key: "navTestimonies", href: "/iglesia/testimonios" },
   { key: "navContact", href: "/iglesia/contacto" },
 ] as const;
 
@@ -97,6 +99,13 @@ export function ChurchHeader() {
               <Globe className="w-3.5 h-3.5" />
               {lang === "en" ? "ES" : "EN"}
             </button>
+            <Link
+              href="/iglesia/donar"
+              className="flex items-center gap-1.5 bg-[#C9A86C] hover:bg-[#B8956A] text-white text-xs font-medium tracking-wide px-4 py-2 rounded-full transition-all duration-300 shadow-sm hover:shadow-md"
+            >
+              <Heart className="w-3.5 h-3.5" />
+              {l.navGive}
+            </Link>
           </div>
 
           {/* Mobile: lang toggle + menu button */}
@@ -181,9 +190,17 @@ export function ChurchHeader() {
                     );
                   })}
                 </nav>
-                <div className="border-t border-[#E8E0D5] px-6 py-6">
+                <div className="border-t border-[#E8E0D5] px-6 py-6 space-y-4">
+                  <Link
+                    href="/iglesia/donar"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 bg-[#C9A86C] hover:bg-[#B8956A] text-white font-medium px-6 py-3 rounded-full text-sm tracking-wide transition-colors w-full"
+                  >
+                    <Heart className="w-4 h-4" />
+                    {l.navGive}
+                  </Link>
                   <p className="text-sm text-[#6B5D4D]">{l.mobileSunday}</p>
-                  <p className="text-sm text-[#6B5D4D] mt-1">
+                  <p className="text-sm text-[#6B5D4D]">
                     73 Nollamara Ave, Nollamara WA
                   </p>
                 </div>

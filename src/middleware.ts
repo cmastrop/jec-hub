@@ -15,7 +15,7 @@ export async function middleware(request: NextRequest) {
     hostname === "www.jesuseselcamino.com.au";
 
   // Church sub-routes that get rewritten to /iglesia/*
-  const churchSubRoutes = ["/nosotros", "/ministerios", "/eventos", "/contacto", "/testimonios", "/donar"];
+  const churchSubRoutes = ["/nosotros", "/ministerios", "/eventos", "/contacto", "/testimonios", "/donar", "/sermones"];
 
   if (isChurchDomain) {
     // Root path → rewrite to /iglesia (URL stays clean)
