@@ -47,12 +47,20 @@ export default function MinisteriosPage() {
       leader: l.sundaySchoolLeader,
       img: "/iglesia/children.jpg",
     },
+    {
+      title: l.worshipTitle,
+      desc: l.worshipDescLong,
+      category: l.worshipCategory,
+      schedule: l.worshipSchedule,
+      leader: l.worshipLeader,
+      img: "/iglesia/worship-team.jpg",
+    },
   ];
 
   return (
     <>
       <PageHero
-        image="/iglesia/musicians.jpg"
+        image="/iglesia/congregation.jpg"
         label={l.ministriesLabel}
         title={l.ministriesTitle1}
         titleAccent={l.ministriesTitle2}
@@ -91,6 +99,7 @@ export default function MinisteriosPage() {
                 key={ministry.title}
                 delay={i * 150}
                 variant={i % 2 === 0 ? "fade-right" : "fade-left"}
+                className={i === ministries.length - 1 && ministries.length % 2 !== 0 ? "sm:col-span-2 sm:max-w-lg sm:mx-auto" : ""}
               >
                 <div className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden group h-full flex flex-col">
                   {/* Image */}

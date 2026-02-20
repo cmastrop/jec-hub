@@ -47,6 +47,7 @@ export default function SermonesPage() {
       duration: "12 min",
       date: lang === "en" ? "Feb 2022" : "Feb 2022",
       spotifyId: "36uYNNzcciNCQCqTS1us5O",
+      thumbnail: "https://image-cdn-ak.spotifycdn.com/image/ab67656300005f1f98811e3512bb396518b2c42b",
     },
     {
       title: l.spotify2Title,
@@ -55,6 +56,7 @@ export default function SermonesPage() {
       duration: "43 min",
       date: lang === "en" ? "Aug 2021" : "Ago 2021",
       spotifyId: "1RXaXy1GIwYVOnXM6IS5fI",
+      thumbnail: "https://image-cdn-ak.spotifycdn.com/image/ab67656300005f1f2ea64effd56963c918f6a45f",
     },
     {
       title: l.spotify3Title,
@@ -63,6 +65,7 @@ export default function SermonesPage() {
       duration: "8 min",
       date: lang === "en" ? "Feb 2021" : "Feb 2021",
       spotifyId: "7lFVsoyWzYkwyockTb6lxK",
+      thumbnail: "https://image-cdn-ak.spotifycdn.com/image/ab67656300005f1f98811e3512bb396518b2c42b",
     },
   ];
 
@@ -232,14 +235,22 @@ export default function SermonesPage() {
                   rel="noopener noreferrer"
                   className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group h-full flex flex-col"
                 >
-                  {/* Spotify visual header */}
-                  <div className="bg-gradient-to-br from-[#1DB954] to-[#158a3e] p-6 flex items-center justify-between">
-                    <div>
-                      <span className="bg-white/20 text-white text-xs font-semibold px-2.5 py-0.5 rounded-full">
-                        {podcast.series}
-                      </span>
+                  {/* Spotify episode thumbnail */}
+                  <div className="aspect-square relative overflow-hidden">
+                    <img
+                      src={podcast.thumbnail}
+                      alt={podcast.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
+                    {/* Series badge */}
+                    <span className="absolute top-4 left-4 bg-[#1DB954] text-white text-xs font-semibold px-2.5 py-0.5 rounded-full shadow">
+                      {podcast.series}
+                    </span>
+                    {/* Spotify icon */}
+                    <div className="absolute bottom-4 right-4">
+                      <Headphones className="w-6 h-6 text-white/80 group-hover:text-white transition-colors drop-shadow-lg" />
                     </div>
-                    <Headphones className="w-8 h-8 text-white/80 group-hover:text-white transition-colors" />
                   </div>
 
                   {/* Content */}
