@@ -1,6 +1,6 @@
 "use client";
 
-import { Play, User, Calendar, Clock } from "lucide-react";
+import { Play, User, Calendar, ExternalLink } from "lucide-react";
 import { useLang } from "@/lib/iglesia/use-lang";
 import { translations } from "@/lib/iglesia/translations";
 import { FadeIn } from "@/components/iglesia/fade-in";
@@ -18,54 +18,24 @@ export default function SermonesPage() {
       desc: l.sermon1Desc,
       series: l.sermon1Series,
       speaker: l.sermonsPastorMorris,
-      date: "Feb 16, 2025",
-      duration: "42 min",
-      image: "/iglesia/sermon-1.jpg",
+      date: lang === "en" ? "Sep 21, 2025" : "21 Sep 2025",
+      youtubeId: "UYkCTuR5aBQ",
     },
     {
       title: l.sermon2Title,
       desc: l.sermon2Desc,
       series: l.sermon2Series,
       speaker: l.sermonsPastorMorris,
-      date: "Feb 9, 2025",
-      duration: "38 min",
-      image: "/iglesia/sermon-2.jpg",
+      date: lang === "en" ? "Sep 6, 2017" : "6 Sep 2017",
+      youtubeId: "reTiSkwk_oU",
     },
     {
       title: l.sermon3Title,
       desc: l.sermon3Desc,
       series: l.sermon3Series,
       speaker: l.sermonsPastorMorris,
-      date: "Feb 2, 2025",
-      duration: "45 min",
-      image: "/iglesia/sermon-3.jpg",
-    },
-    {
-      title: l.sermon4Title,
-      desc: l.sermon4Desc,
-      series: l.sermon4Series,
-      speaker: l.sermonsPastorMorris,
-      date: "Jan 26, 2025",
-      duration: "40 min",
-      image: "/iglesia/sermon-4.jpg",
-    },
-    {
-      title: l.sermon5Title,
-      desc: l.sermon5Desc,
-      series: l.sermon5Series,
-      speaker: l.sermonsPastorMorris,
-      date: "Jan 19, 2025",
-      duration: "36 min",
-      image: "/iglesia/sermon-5.jpg",
-    },
-    {
-      title: l.sermon6Title,
-      desc: l.sermon6Desc,
-      series: l.sermon6Series,
-      speaker: l.sermonsPastorMorris,
-      date: "Jan 12, 2025",
-      duration: "44 min",
-      image: "/iglesia/sermon-6.jpg",
+      date: "",
+      youtubeId: "zD_bPrkJ2uo",
     },
   ];
 
@@ -75,7 +45,7 @@ export default function SermonesPage() {
   return (
     <>
       <PageHero
-        image="/iglesia/sermon-1.jpg"
+        image="/iglesia/preaching.jpg"
         label={l.sermonsLabel}
         title={l.sermonsTitle1}
         titleAccent={l.sermonsTitle2}
@@ -88,19 +58,24 @@ export default function SermonesPage() {
           <FadeIn>
             <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
               <div className="grid lg:grid-cols-2">
-                {/* Image with play button */}
-                <div className="aspect-video lg:aspect-auto relative">
+                {/* YouTube Thumbnail with play button */}
+                <a
+                  href={`https://www.youtube.com/watch?v=${featured.youtubeId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="aspect-video lg:aspect-auto relative block group/thumb"
+                >
                   <img
-                    src={featured.image}
+                    src={`https://i.ytimg.com/vi/${featured.youtubeId}/maxresdefault.jpg`}
                     alt={featured.title}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                    <button className="w-20 h-20 rounded-full bg-white/90 hover:bg-white text-[#4A3F35] shadow-lg flex items-center justify-center transition-colors">
+                  <div className="absolute inset-0 bg-black/40 group-hover/thumb:bg-black/30 transition-colors flex items-center justify-center">
+                    <div className="w-20 h-20 rounded-full bg-white/90 group-hover/thumb:bg-white group-hover/thumb:scale-110 text-[#4A3F35] shadow-lg flex items-center justify-center transition-all duration-300">
                       <Play className="w-10 h-10 ml-1" />
-                    </button>
+                    </div>
                   </div>
-                </div>
+                </a>
 
                 {/* Content */}
                 <div className="p-8 lg:p-12 flex flex-col justify-center">
@@ -119,18 +94,23 @@ export default function SermonesPage() {
                       <User className="w-4 h-4" />
                       {featured.speaker}
                     </span>
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      {featured.date}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      {featured.duration}
-                    </span>
+                    {featured.date && (
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        {featured.date}
+                      </span>
+                    )}
                   </div>
-                  <button className="w-fit bg-[#4A3F35] hover:bg-[#3a3128] text-white rounded-full px-8 py-2.5 text-sm font-medium transition-colors">
+                  <a
+                    href={`https://www.youtube.com/watch?v=${featured.youtubeId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 w-fit bg-[#4A3F35] hover:bg-[#3a3128] text-white rounded-full px-8 py-2.5 text-sm font-medium transition-colors"
+                  >
+                    <Play className="w-4 h-4" />
                     {l.sermonsWatchOnYouTube}
-                  </button>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
                 </div>
               </div>
             </div>
@@ -141,21 +121,26 @@ export default function SermonesPage() {
       {/* ═══ Sermon Grid ═══ */}
       <section className="pb-24 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 gap-8">
             {rest.map((sermon, i) => (
-              <FadeIn key={i} delay={i * 120} variant="fade-up">
-                <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer h-full flex flex-col">
-                  {/* Image with hover play */}
+              <FadeIn key={sermon.youtubeId} delay={i * 150} variant="fade-up">
+                <a
+                  href={`https://www.youtube.com/watch?v=${sermon.youtubeId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer h-full flex flex-col"
+                >
+                  {/* YouTube Thumbnail with hover play */}
                   <div className="aspect-video relative overflow-hidden">
                     <img
-                      src={sermon.image}
+                      src={`https://i.ytimg.com/vi/${sermon.youtubeId}/hqdefault.jpg`}
                       alt={sermon.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <button className="w-14 h-14 rounded-full bg-white/90 hover:bg-white text-[#4A3F35] shadow-lg flex items-center justify-center">
+                      <div className="w-14 h-14 rounded-full bg-white/90 hover:bg-white text-[#4A3F35] shadow-lg flex items-center justify-center">
                         <Play className="w-6 h-6 ml-0.5" />
-                      </button>
+                      </div>
                     </div>
                     {/* Series badge */}
                     <span className="absolute top-4 left-4 bg-[#4A3F35] text-white text-xs font-semibold px-2.5 py-0.5 rounded-md shadow">
@@ -176,13 +161,15 @@ export default function SermonesPage() {
                         <User className="w-3 h-3" />
                         {sermon.speaker.split(" ").slice(0, 2).join(" ")}
                       </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {sermon.duration}
-                      </span>
+                      {sermon.date && (
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {sermon.date}
+                        </span>
+                      )}
                     </div>
                   </div>
-                </div>
+                </a>
               </FadeIn>
             ))}
           </div>
