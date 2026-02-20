@@ -8,12 +8,14 @@ export function PageHero({
   title,
   titleAccent,
   allowOverlap = false,
+  imagePosition,
 }: {
   image: string;
   label: string;
   title: string;
   titleAccent?: string;
   allowOverlap?: boolean;
+  imagePosition?: string;
 }) {
   return (
     <section
@@ -27,6 +29,7 @@ export function PageHero({
         src={image}
         alt={titleAccent ? `${title} ${titleAccent}` : title}
         className="absolute inset-0 w-full h-full object-cover"
+        style={imagePosition ? { objectPosition: imagePosition } : undefined}
       />
       <div className="absolute inset-0 bg-gradient-to-b from-[#2a1f14]/60 via-[#1a1510]/50 to-[#0f0c08]/70" />
       <div className="relative z-10 text-center px-4">

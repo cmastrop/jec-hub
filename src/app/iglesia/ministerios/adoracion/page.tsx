@@ -79,7 +79,7 @@ export default function WorshipMinistryPage() {
 
       {/* ═══ Dark Worship Section ═══ */}
       <section className="relative py-28 sm:py-36 overflow-hidden">
-        <img src="/iglesia/worship-hands.jpg" alt="Worship" className="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: "center 30%" }} />
+        <img src="/iglesia/worship-leader-bg.jpg" alt="Worship" className="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: "center 30%" }} />
         <div className="absolute inset-0 bg-[#2a1f14]/85" />
         <div className="absolute top-20 right-20 w-72 h-72 bg-[#C9A86C] rounded-full opacity-5" />
         <div className="absolute bottom-20 left-20 w-56 h-56 bg-white rounded-full opacity-5" />

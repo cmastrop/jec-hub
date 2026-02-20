@@ -21,11 +21,12 @@ export default function NosotrosPage() {
   return (
     <>
       <PageHero
-        image="/iglesia/speaker.jpg"
+        image="/iglesia/rachel-preaching.jpg"
         label={l.aboutLabel}
         title={l.aboutTitle1}
         titleAccent={l.aboutTitle2}
         allowOverlap
+        imagePosition="center 30%"
       />
 
       {/* ═══ VISION — 3 Pillars (overlapping hero) ═══ */}
