@@ -62,7 +62,7 @@ export default function SermonesPage() {
       series: l.spotify3Series,
       duration: "8 min",
       date: lang === "en" ? "Feb 2021" : "Feb 2021",
-      spotifyId: "7lFVsoyWzYkwyockTb6lxK",
+      spotifyId: "6i2ohIqvduXIYPjOzDludV",
     },
   ];
 
