@@ -9,6 +9,7 @@ export function PageHero({
   titleAccent,
   allowOverlap = false,
   imagePosition,
+  tall = false,
 }: {
   image: string;
   label: string;
@@ -16,13 +17,16 @@ export function PageHero({
   titleAccent?: string;
   allowOverlap?: boolean;
   imagePosition?: string;
+  tall?: boolean;
 }) {
   return (
     <section
       className={`relative flex items-center justify-center overflow-hidden ${
-        allowOverlap
-          ? "h-[50vh] min-h-[380px]"
-          : "h-[40vh] min-h-[320px]"
+        tall
+          ? "h-[65vh] min-h-[480px]"
+          : allowOverlap
+            ? "h-[50vh] min-h-[380px]"
+            : "h-[40vh] min-h-[320px]"
       }`}
     >
       <img

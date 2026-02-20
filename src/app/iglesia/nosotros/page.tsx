@@ -26,7 +26,8 @@ export default function NosotrosPage() {
         title={l.aboutTitle1}
         titleAccent={l.aboutTitle2}
         allowOverlap
-        imagePosition="center 68%"
+        tall
+        imagePosition="center 45%"
       />
 
       {/* ═══ VISION — 3 Pillars (overlapping hero) ═══ */}
