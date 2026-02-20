@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Radio, Clock, MapPin, Bell, ExternalLink, Play } from "lucide-react";
+import { Radio, Clock, MapPin, Bell } from "lucide-react";
 import { useLang } from "@/lib/iglesia/use-lang";
 import { translations } from "@/lib/iglesia/translations";
 import { FadeIn } from "@/components/iglesia/fade-in";
@@ -59,16 +59,10 @@ export default function EnVivoPage() {
                     {l.liveSundayTime}
                   </span>
                 </div>
-                <a
-                  href={`${YOUTUBE_CHANNEL_URL}/live`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-[#FF0000] hover:bg-[#cc0000] text-white rounded-full px-6 py-2.5 text-sm font-medium transition-colors"
-                >
-                  <Play className="w-4 h-4" />
-                  {l.liveWatchButton}
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
+                <div className="flex items-center gap-2 text-sm text-[#6B5D4D]">
+                  <Radio className="w-4 h-4 text-red-500" />
+                  {l.liveWatchHere}
+                </div>
               </div>
             </div>
           </FadeIn>
@@ -157,11 +151,10 @@ export default function EnVivoPage() {
               href={`${YOUTUBE_CHANNEL_URL}?sub_confirmation=1`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-[#FF0000] hover:bg-[#cc0000] text-white font-semibold px-8 py-4 text-lg rounded-full transition-colors shadow-lg"
+              className="inline-flex items-center gap-2 bg-[#C9A86C] hover:bg-[#B8956A] text-white font-semibold px-8 py-4 text-lg rounded-full transition-colors shadow-lg"
             >
-              <Play className="w-5 h-5" />
+              <Bell className="w-5 h-5" />
               {l.liveSubscribeButton}
-              <ExternalLink className="w-4 h-4" />
             </a>
           </FadeIn>
         </div>
