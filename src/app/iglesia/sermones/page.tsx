@@ -1,6 +1,6 @@
 "use client";
 
-import { Play, User, Calendar, ExternalLink, Headphones, Music } from "lucide-react";
+import { User, Calendar, Music } from "lucide-react";
 import { useLang } from "@/lib/iglesia/use-lang";
 import { translations } from "@/lib/iglesia/translations";
 import { FadeIn } from "@/components/iglesia/fade-in";
@@ -47,7 +47,6 @@ export default function SermonesPage() {
       duration: "12 min",
       date: lang === "en" ? "Feb 2022" : "Feb 2022",
       spotifyId: "36uYNNzcciNCQCqTS1us5O",
-      thumbnail: "https://image-cdn-ak.spotifycdn.com/image/ab67656300005f1f98811e3512bb396518b2c42b",
     },
     {
       title: l.spotify2Title,
@@ -56,7 +55,6 @@ export default function SermonesPage() {
       duration: "43 min",
       date: lang === "en" ? "Aug 2021" : "Ago 2021",
       spotifyId: "1RXaXy1GIwYVOnXM6IS5fI",
-      thumbnail: "https://image-cdn-ak.spotifycdn.com/image/ab67656300005f1f2ea64effd56963c918f6a45f",
     },
     {
       title: l.spotify3Title,
@@ -65,7 +63,6 @@ export default function SermonesPage() {
       duration: "8 min",
       date: lang === "en" ? "Feb 2021" : "Feb 2021",
       spotifyId: "7lFVsoyWzYkwyockTb6lxK",
-      thumbnail: "https://image-cdn-ak.spotifycdn.com/image/ab67656300005f1f98811e3512bb396518b2c42b",
     },
   ];
 
@@ -88,24 +85,16 @@ export default function SermonesPage() {
           <FadeIn>
             <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
               <div className="grid lg:grid-cols-2">
-                {/* YouTube Thumbnail with play button */}
-                <a
-                  href={`https://www.youtube.com/watch?v=${featured.youtubeId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="aspect-video lg:aspect-auto relative block group/thumb"
-                >
-                  <img
-                    src={`https://i.ytimg.com/vi/${featured.youtubeId}/maxresdefault.jpg`}
-                    alt={featured.title}
-                    className="w-full h-full object-cover"
+                {/* Embedded YouTube Player */}
+                <div className="aspect-video lg:aspect-auto lg:min-h-[360px] relative">
+                  <iframe
+                    src={`https://www.youtube.com/embed/${featured.youtubeId}`}
+                    title={featured.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="absolute inset-0 w-full h-full"
                   />
-                  <div className="absolute inset-0 bg-black/40 group-hover/thumb:bg-black/30 transition-colors flex items-center justify-center">
-                    <div className="w-20 h-20 rounded-full bg-white/90 group-hover/thumb:bg-white group-hover/thumb:scale-110 text-[#4A3F35] shadow-lg flex items-center justify-center transition-all duration-300">
-                      <Play className="w-10 h-10 ml-1" />
-                    </div>
-                  </div>
-                </a>
+                </div>
 
                 {/* Content */}
                 <div className="p-8 lg:p-12 flex flex-col justify-center">
@@ -119,7 +108,7 @@ export default function SermonesPage() {
                     {featured.title}
                   </h2>
                   <p className="text-[#6B5D4D] mb-6">{featured.desc}</p>
-                  <div className="flex flex-wrap gap-4 text-sm text-[#6B5D4D] mb-6">
+                  <div className="flex flex-wrap gap-4 text-sm text-[#6B5D4D]">
                     <span className="flex items-center gap-1">
                       <User className="w-4 h-4" />
                       {featured.speaker}
@@ -131,16 +120,6 @@ export default function SermonesPage() {
                       </span>
                     )}
                   </div>
-                  <a
-                    href={`https://www.youtube.com/watch?v=${featured.youtubeId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 w-fit bg-[#4A3F35] hover:bg-[#3a3128] text-white rounded-full px-8 py-2.5 text-sm font-medium transition-colors"
-                  >
-                    <Play className="w-4 h-4" />
-                    {l.sermonsWatchOnYouTube}
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
                 </div>
               </div>
             </div>
@@ -154,33 +133,24 @@ export default function SermonesPage() {
           <div className="grid md:grid-cols-2 gap-8">
             {rest.map((sermon, i) => (
               <FadeIn key={sermon.youtubeId} delay={i * 150} variant="fade-up">
-                <a
-                  href={`https://www.youtube.com/watch?v=${sermon.youtubeId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer h-full flex flex-col"
-                >
-                  {/* YouTube Thumbnail with hover play */}
-                  <div className="aspect-video relative overflow-hidden">
-                    <img
-                      src={`https://i.ytimg.com/vi/${sermon.youtubeId}/hqdefault.jpg`}
-                      alt={sermon.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden h-full flex flex-col">
+                  {/* Embedded YouTube Player */}
+                  <div className="aspect-video relative">
+                    <iframe
+                      src={`https://www.youtube.com/embed/${sermon.youtubeId}`}
+                      title={sermon.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="absolute inset-0 w-full h-full"
                     />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <div className="w-14 h-14 rounded-full bg-white/90 hover:bg-white text-[#4A3F35] shadow-lg flex items-center justify-center">
-                        <Play className="w-6 h-6 ml-0.5" />
-                      </div>
-                    </div>
-                    {/* Series badge */}
-                    <span className="absolute top-4 left-4 bg-[#4A3F35] text-white text-xs font-semibold px-2.5 py-0.5 rounded-md shadow">
-                      {sermon.series}
-                    </span>
                   </div>
 
                   {/* Content */}
                   <div className="p-6 flex-1 flex flex-col">
-                    <h3 className="text-lg font-semibold text-[#4A3F35] mb-2 group-hover:text-[#C9A86C] transition-colors line-clamp-2">
+                    <span className="inline-block w-fit bg-[#4A3F35] text-white text-xs font-semibold px-2.5 py-0.5 rounded-md mb-3">
+                      {sermon.series}
+                    </span>
+                    <h3 className="text-lg font-semibold text-[#4A3F35] mb-2 line-clamp-2">
                       {sermon.title}
                     </h3>
                     <p className="text-[#6B5D4D] text-sm mb-4 line-clamp-2 flex-1">
@@ -199,7 +169,7 @@ export default function SermonesPage() {
                       )}
                     </div>
                   </div>
-                </a>
+                </div>
               </FadeIn>
             ))}
           </div>
@@ -229,57 +199,41 @@ export default function SermonesPage() {
           <div className="grid md:grid-cols-3 gap-6">
             {podcasts.map((podcast, i) => (
               <FadeIn key={podcast.spotifyId} delay={i * 150} variant="fade-up">
-                <a
-                  href={`https://open.spotify.com/episode/${podcast.spotifyId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group h-full flex flex-col"
-                >
-                  {/* Spotify episode thumbnail */}
-                  <div className="aspect-square relative overflow-hidden">
-                    <img
-                      src={podcast.thumbnail}
-                      alt={podcast.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden h-full flex flex-col">
+                  {/* Embedded Spotify Player */}
+                  <div className="w-full">
+                    <iframe
+                      src={`https://open.spotify.com/embed/episode/${podcast.spotifyId}?utm_source=generator&theme=0`}
+                      title={podcast.title}
+                      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                      loading="lazy"
+                      className="w-full rounded-t-xl"
+                      height="352"
                     />
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors" />
-                    {/* Series badge */}
-                    <span className="absolute top-4 left-4 bg-[#1DB954] text-white text-xs font-semibold px-2.5 py-0.5 rounded-full shadow">
-                      {podcast.series}
-                    </span>
-                    {/* Spotify icon */}
-                    <div className="absolute bottom-4 right-4">
-                      <Headphones className="w-6 h-6 text-white/80 group-hover:text-white transition-colors drop-shadow-lg" />
-                    </div>
                   </div>
 
                   {/* Content */}
                   <div className="p-6 flex-1 flex flex-col">
-                    <h3 className="text-lg font-semibold text-[#4A3F35] mb-2 group-hover:text-[#1DB954] transition-colors">
+                    <h3 className="text-lg font-semibold text-[#4A3F35] mb-2">
                       {podcast.title}
                     </h3>
                     <p className="text-[#6B5D4D] text-sm mb-4 flex-1">
                       {podcast.desc}
                     </p>
-                    <div className="flex items-center justify-between text-xs text-[#6B5D4D]">
-                      <div className="flex gap-3">
-                        <span className="flex items-center gap-1">
-                          <Music className="w-3 h-3" />
-                          {podcast.duration}
-                        </span>
-                        {podcast.date && (
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3" />
-                            {podcast.date}
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-[#1DB954] font-semibold group-hover:underline">
-                        {l.sermonsListenNow} →
+                    <div className="flex gap-3 text-xs text-[#6B5D4D]">
+                      <span className="flex items-center gap-1">
+                        <Music className="w-3 h-3" />
+                        {podcast.duration}
                       </span>
+                      {podcast.date && (
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {podcast.date}
+                        </span>
+                      )}
                     </div>
                   </div>
-                </a>
+                </div>
               </FadeIn>
             ))}
           </div>
