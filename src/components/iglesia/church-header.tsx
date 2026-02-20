@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, Globe, Heart } from "lucide-react";
+import { Menu, X, Globe, Heart, Radio } from "lucide-react";
 import { useLang } from "@/lib/iglesia/use-lang";
 import { translations } from "@/lib/iglesia/translations";
 
@@ -18,6 +18,7 @@ const navItems = [
   { key: "navEvents", href: "/iglesia/eventos" },
   { key: "navTestimonies", href: "/iglesia/testimonios" },
   { key: "navContact", href: "/iglesia/contacto" },
+  { key: "navLive", href: "/iglesia/en-vivo", isLive: true },
 ] as const;
 
 export function ChurchHeader() {
@@ -71,18 +72,22 @@ export function ChurchHeader() {
               {navItems.map((item) => {
                 const label = l[item.key as keyof typeof l] as string;
                 const isActive = pathname === item.href;
+                const isLive = "isLive" in item && item.isLive;
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`text-sm tracking-wide font-medium transition-colors duration-300 hover:text-[#C9A86C] ${
+                    className={`text-sm tracking-wide font-medium transition-colors duration-300 hover:text-[#C9A86C] flex items-center gap-1.5 ${
                       isActive
                         ? "text-[#C9A86C]"
+                        : isLive
+                        ? "text-red-500"
                         : showOpaque
                         ? "text-[#4A3F35]"
                         : "text-white/90"
                     }`}
                   >
+                    {isLive && <Radio className="w-3.5 h-3.5" />}
                     {label}
                   </Link>
                 );
@@ -174,17 +179,21 @@ export function ChurchHeader() {
                   {navItems.map((item) => {
                     const label = l[item.key as keyof typeof l] as string;
                     const isActive = pathname === item.href;
+                    const isLive = "isLive" in item && item.isLive;
                     return (
                       <Link
                         key={item.href}
                         href={item.href}
                         onClick={() => setMobileMenuOpen(false)}
-                        className={`block w-full text-left px-4 py-3 rounded-lg text-base font-medium tracking-wide transition-colors ${
+                        className={`flex items-center gap-2 w-full text-left px-4 py-3 rounded-lg text-base font-medium tracking-wide transition-colors ${
                           isActive
                             ? "text-[#C9A86C] bg-[#C9A86C]/5"
+                            : isLive
+                            ? "text-red-500 hover:bg-red-50"
                             : "text-[#4A3F35] hover:text-[#C9A86C] hover:bg-[#C9A86C]/5"
                         }`}
                       >
+                        {isLive && <Radio className="w-4 h-4" />}
                         {label}
                       </Link>
                     );

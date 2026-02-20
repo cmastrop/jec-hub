@@ -1,6 +1,6 @@
 "use client";
 
-import { Play, User, Calendar, ExternalLink } from "lucide-react";
+import { Play, User, Calendar, ExternalLink, Headphones, Music } from "lucide-react";
 import { useLang } from "@/lib/iglesia/use-lang";
 import { translations } from "@/lib/iglesia/translations";
 import { FadeIn } from "@/components/iglesia/fade-in";
@@ -36,6 +36,33 @@ export default function SermonesPage() {
       speaker: l.sermonsPastorMorris,
       date: "",
       youtubeId: "zD_bPrkJ2uo",
+    },
+  ];
+
+  const podcasts = [
+    {
+      title: l.spotify1Title,
+      desc: l.spotify1Desc,
+      series: l.spotify1Series,
+      duration: "12 min",
+      date: lang === "en" ? "Feb 2022" : "Feb 2022",
+      spotifyId: "36uYNNzcciNCQCqTS1us5O",
+    },
+    {
+      title: l.spotify2Title,
+      desc: l.spotify2Desc,
+      series: l.spotify2Series,
+      duration: "43 min",
+      date: lang === "en" ? "Aug 2021" : "Ago 2021",
+      spotifyId: "1RXaXy1GIwYVOnXM6IS5fI",
+    },
+    {
+      title: l.spotify3Title,
+      desc: l.spotify3Desc,
+      series: l.spotify3Series,
+      duration: "8 min",
+      date: lang === "en" ? "Feb 2021" : "Feb 2021",
+      spotifyId: "7lFVsoyWzYkwyockTb6lxK",
     },
   ];
 
@@ -167,6 +194,78 @@ export default function SermonesPage() {
                           {sermon.date}
                         </span>
                       )}
+                    </div>
+                  </div>
+                </a>
+              </FadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ Spotify Podcast Section ═══ */}
+      <section className="py-24 px-4 sm:px-6 bg-[#1DB954]/5">
+        <div className="max-w-6xl mx-auto">
+          <FadeIn className="text-center mb-16">
+            <p className="text-[#1DB954] tracking-[0.3em] text-xs uppercase mb-4">
+              {l.sermonsSpotifyLabel}
+            </p>
+            <h2
+              className="text-3xl sm:text-4xl text-[#4A3F35] mb-4"
+              style={serif}
+            >
+              <span className="font-light">{l.sermonsSpotifyTitle1} </span>
+              <span className="font-bold">{l.sermonsSpotifyTitle2}</span>
+            </h2>
+            <div className="w-16 h-0.5 bg-[#1DB954] mx-auto mb-6" />
+            <p className="text-[#6B5D4D] text-base sm:text-lg max-w-2xl mx-auto">
+              {l.sermonsSpotifyDesc}
+            </p>
+          </FadeIn>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {podcasts.map((podcast, i) => (
+              <FadeIn key={podcast.spotifyId} delay={i * 150} variant="fade-up">
+                <a
+                  href={`https://open.spotify.com/episode/${podcast.spotifyId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group h-full flex flex-col"
+                >
+                  {/* Spotify visual header */}
+                  <div className="bg-gradient-to-br from-[#1DB954] to-[#158a3e] p-6 flex items-center justify-between">
+                    <div>
+                      <span className="bg-white/20 text-white text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                        {podcast.series}
+                      </span>
+                    </div>
+                    <Headphones className="w-8 h-8 text-white/80 group-hover:text-white transition-colors" />
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-6 flex-1 flex flex-col">
+                    <h3 className="text-lg font-semibold text-[#4A3F35] mb-2 group-hover:text-[#1DB954] transition-colors">
+                      {podcast.title}
+                    </h3>
+                    <p className="text-[#6B5D4D] text-sm mb-4 flex-1">
+                      {podcast.desc}
+                    </p>
+                    <div className="flex items-center justify-between text-xs text-[#6B5D4D]">
+                      <div className="flex gap-3">
+                        <span className="flex items-center gap-1">
+                          <Music className="w-3 h-3" />
+                          {podcast.duration}
+                        </span>
+                        {podcast.date && (
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {podcast.date}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[#1DB954] font-semibold group-hover:underline">
+                        {l.sermonsListenNow} →
+                      </span>
                     </div>
                   </div>
                 </a>
