@@ -135,7 +135,7 @@ export default function IglesiaPage() {
                 <div className="group relative overflow-hidden bg-white rounded-xl shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500">
                   <div className="relative h-56 overflow-hidden">
                     <img
-                      src="/iglesia/worship.jpg"
+                      src="/iglesia/wednesday-worship.jpg"
                       alt={l.wednesdayTitle}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
@@ -240,7 +240,7 @@ export default function IglesiaPage() {
             <FadeIn delay={0} variant="scale-in" className="col-span-2 row-span-2">
               <div className="group overflow-hidden rounded-xl h-full">
                 <img
-                  src="/iglesia/worship.jpg"
+                  src="/iglesia/gallery-worship.jpg"
                   alt="Worship"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
@@ -249,8 +249,8 @@ export default function IglesiaPage() {
             <FadeIn delay={100} variant="fade-left">
               <div className="group overflow-hidden rounded-xl h-full">
                 <img
-                  src="/iglesia/preaching.jpg"
-                  alt="Preaching"
+                  src="/iglesia/gallery-bible.jpg"
+                  alt="Bible"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
               </div>
@@ -267,8 +267,8 @@ export default function IglesiaPage() {
             <FadeIn delay={300} variant="fade-up">
               <div className="group overflow-hidden rounded-xl h-full">
                 <img
-                  src="/iglesia/youth.jpg"
-                  alt="Youth"
+                  src="/iglesia/gallery-fellowship.jpg"
+                  alt="Fellowship"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
               </div>
@@ -276,8 +276,8 @@ export default function IglesiaPage() {
             <FadeIn delay={400} variant="fade-up">
               <div className="group overflow-hidden rounded-xl h-full">
                 <img
-                  src="/iglesia/children.jpg"
-                  alt="Children"
+                  src="/iglesia/gallery-prayer.jpg"
+                  alt="Prayer"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
               </div>
@@ -324,10 +324,9 @@ export default function IglesiaPage() {
       {/* ═══ CTA BANNER ═══ */}
       <section className="relative py-28 sm:py-36 overflow-hidden">
         <img
-          src="/iglesia/worship.jpg"
-          alt="Worship"
+          src="/iglesia/cta-bg.jpg"
+          alt="Church"
           className="absolute inset-0 w-full h-full object-cover"
-          style={{ objectPosition: "center 30%" }}
         />
         <div className="absolute inset-0 bg-[#2a1f14]/85" />
 

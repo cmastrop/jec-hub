@@ -47,7 +47,7 @@ export default function ContactoPage() {
   return (
     <>
       <PageHero
-        image="/iglesia/worship.jpg"
+        image="/iglesia/contact-hero.jpg"
         label={l.contactLabel}
         title={l.contactTitle1}
         titleAccent={l.contactTitle2}

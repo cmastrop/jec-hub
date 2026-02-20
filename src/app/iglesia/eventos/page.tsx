@@ -101,7 +101,7 @@ export default function EventosPage() {
   return (
     <>
       <PageHero
-        image="/iglesia/hero-service.jpg"
+        image="/iglesia/events-hero.jpg"
         label={l.eventsLabel}
         title={l.eventsTitle1}
         titleAccent={l.eventsTitle2}
