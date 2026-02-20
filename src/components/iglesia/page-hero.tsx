@@ -21,13 +21,7 @@ export function PageHero({
 }) {
   return (
     <section
-      className={`relative flex items-center justify-center overflow-hidden ${
-        tall
-          ? "h-[65vh] min-h-[480px]"
-          : allowOverlap
-            ? "h-[50vh] min-h-[380px]"
-            : "h-[40vh] min-h-[320px]"
-      }`}
+      className="relative flex items-center justify-center overflow-hidden h-[50vh] min-h-[380px]"
     >
       <img
         src={image}

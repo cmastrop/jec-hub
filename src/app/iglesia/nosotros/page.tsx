@@ -26,7 +26,6 @@ export default function NosotrosPage() {
         title={l.aboutTitle1}
         titleAccent={l.aboutTitle2}
         allowOverlap
-        tall
         imagePosition="center 45%"
       />
 
