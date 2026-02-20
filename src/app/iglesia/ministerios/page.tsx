@@ -21,6 +21,7 @@ export default function MinisteriosPage() {
       schedule: l.mensSchedule,
       leader: l.mensLeader,
       img: "/iglesia/mens-group.jpg",
+      slug: "hombres",
     },
     {
       title: l.womensTitle,
@@ -29,6 +30,7 @@ export default function MinisteriosPage() {
       schedule: l.womensSchedule,
       leader: l.womensLeader,
       img: "/iglesia/womens-group.jpg",
+      slug: "mujeres",
     },
     {
       title: l.youthTitle,
@@ -38,6 +40,7 @@ export default function MinisteriosPage() {
       schedule: l.youthSchedule,
       leader: l.youthLeader,
       img: "/iglesia/youth.jpg",
+      slug: "jovenes",
     },
     {
       title: l.sundaySchoolTitle,
@@ -46,6 +49,7 @@ export default function MinisteriosPage() {
       schedule: l.sundaySchoolSchedule,
       leader: l.sundaySchoolLeader,
       img: "/iglesia/children.jpg",
+      slug: "ninos",
     },
     {
       title: l.worshipTitle,
@@ -54,6 +58,7 @@ export default function MinisteriosPage() {
       schedule: l.worshipSchedule,
       leader: l.worshipLeader,
       img: "/iglesia/worship-team.jpg",
+      slug: "adoracion",
     },
   ];
 
@@ -149,7 +154,7 @@ export default function MinisteriosPage() {
 
                     {/* CTA */}
                     <Link
-                      href="/iglesia/contacto"
+                      href={`/iglesia/ministerios/${ministry.slug}`}
                       className="inline-flex items-center gap-2 mt-6 w-fit bg-[#4A3F35] hover:bg-[#3a3128] text-white rounded-full px-6 py-2.5 text-sm font-medium transition-colors group/btn"
                     >
                       {l.ministriesLearnMore}
