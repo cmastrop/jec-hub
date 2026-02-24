@@ -2,11 +2,8 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAIExtractor } from "@/lib/ai";
 import { parseChordPro } from "@/lib/chordpro/parser";
-import { RateLimiter } from "@/lib/migration/utils";
 
 export const maxDuration = 60;
-
-const limiter = new RateLimiter(14, 1400);
 
 export async function POST(request: Request) {
   try {
@@ -29,10 +26,18 @@ export async function POST(request: Request) {
       .limit(Math.min(batchSize, 5));
 
     if (!items || items.length === 0) {
+      // Check if there are still pending items (might be stuck in "processing")
+      const { count: remaining } = await admin
+        .from("import_items")
+        .select("*", { count: "exact", head: true })
+        .eq("job_id", jobId)
+        .in("status", ["pending", "processing"]);
+
       return NextResponse.json({
         processed: 0,
         failed: 0,
         dailyLimitReached: false,
+        remaining: remaining ?? 0,
       });
     }
 
@@ -161,7 +166,19 @@ export async function POST(request: Request) {
         .eq("id", jobId);
     }
 
-    return NextResponse.json({ processed, failed, dailyLimitReached });
+    // Count remaining pending items
+    const { count: remaining } = await admin
+      .from("import_items")
+      .select("*", { count: "exact", head: true })
+      .eq("job_id", jobId)
+      .eq("status", "pending");
+
+    return NextResponse.json({
+      processed,
+      failed,
+      dailyLimitReached,
+      remaining: remaining ?? 0,
+    });
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : String(err) },

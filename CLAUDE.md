@@ -30,12 +30,20 @@ src/
       layout.tsx         # Layout con Playfair Display font + SEO metadata + ChurchShell wrapper
       page.tsx           # Homepage: hero + servicios + ministerios preview + CTA
       nosotros/page.tsx  # About: vision (3 pilares), mision, pastores
-      ministerios/page.tsx # Ministerios: grid completo de ministerios
+      ministerios/page.tsx # Ministerios: grid completo de ministerios con links a paginas individuales
+        hombres/page.tsx   # Ministerio de Hombres: intro, features, lider, CTA
+        mujeres/page.tsx   # Ministerio de Mujeres: intro, features, lider, CTA
+        jovenes/page.tsx   # Ministerio de Jovenes (Zoe Zone): intro, features, lider, CTA
+        ninos/page.tsx     # Escuela Dominical: intro, features, lider, CTA
+        adoracion/page.tsx # Equipo de Adoracion: intro, features, lider, CTA
       eventos/page.tsx   # Eventos: calendario publico + lista de eventos
       contacto/page.tsx  # Contacto: 3 info cards overlapping + formulario
-      sermones/page.tsx  # Sermones: featured + grid 3x2 con play overlays
+      sermones/page.tsx  # Sermones: featured + grid con YouTube embeds + Spotify podcasts
+        la-epoca-dorada-del-matrimonio/page.tsx  # Blog: sermon notes (Family & Faith)
+        el-don-de-la-sabiduria/page.tsx          # Blog: sermon notes (Spiritual Gifts)
+        el-arbol-de-la-vida/page.tsx             # Blog: sermon notes (Bible Study)
       testimonios/page.tsx # Testimonios: cards con fotos + CTA compartir
-      donar/page.tsx     # Donar: scripture + 2-col (formas de dar + impacto)
+      donar/page.tsx     # Donar: scripture + 2-col (formas de dar + 3 cuentas bancarias + impacto)
     (auth)/              # Layout de autenticacion (login/registro)
       layout.tsx         # Split layout con imagen de adoracion + form
       login/page.tsx     # Pagina de login
@@ -424,40 +432,46 @@ Permisos:
 |------|-----------|
 | `/iglesia` | Homepage: hero + servicios + ministerios preview + CTA |
 | `/iglesia/nosotros` | Vision (3 pilares) + Mision + Pastores |
-| `/iglesia/ministerios` | Grid completo de ministerios (4 cards) |
+| `/iglesia/ministerios` | Grid completo de ministerios (5 cards con links a paginas individuales) |
+| `/iglesia/ministerios/hombres` | Ministerio de Hombres: verso, 3 features, lider Morris, CTA |
+| `/iglesia/ministerios/mujeres` | Ministerio de Mujeres: verso, 3 features, lider Daisy, CTA |
+| `/iglesia/ministerios/jovenes` | Zoe Zone Jovenes: verso, 3 features, lider Raquel, CTA |
+| `/iglesia/ministerios/ninos` | Escuela Dominical: verso, 3 features, lider Clara, CTA |
+| `/iglesia/ministerios/adoracion` | Equipo Adoracion: verso, 3 features, lider Ronal, CTA |
 | `/iglesia/eventos` | Calendario publico + lista de eventos |
 | `/iglesia/contacto` | 3 info cards overlapping hero + formulario dark section |
 | `/iglesia/sermones` | Featured sermon overlapping + grid 3x2 con play overlays + series badges |
 | `/iglesia/testimonios` | Cards con fotos + categorias + CTA "compartir testimonio" |
-| `/iglesia/donar` | Scripture quote + 2-col (formas de dar + impacto) + bank details |
+| `/iglesia/donar` | Scripture quote + 2-col (formas de dar + 3 cuentas bancarias reales + impacto) |
 
 **Componentes compartidos** (`src/components/iglesia/`):
 - `ChurchShell`: wrapper con LangContext provider + header + footer (en `layout.tsx`)
 - `ChurchHeader`: sticky nav con 7 links (Home, Nosotros, Ministerios, Sermones, Eventos, Testimonios, Contacto) + boton Give/Donar dorado con icono Heart. Transparente en homepage, opaco en sub-paginas. Mobile menu con framer-motion AnimatePresence.
 - `ChurchFooter`: footer con traducciones bilingues
 - `FadeIn`: scroll animations con IntersectionObserver + CSS transitions. Variantes: `fade-up`, `fade-left`, `fade-right`, `scale-in`. Prop `delay` para stagger.
-- `PageHero`: banner 40vh para sub-paginas (imagen + label + titulo). Props opcionales: `titleAccent` (dual-weight), `allowOverlap` (permite cards con `-mt-20`)
+- `PageHero`: banner 50vh/380px para sub-paginas (imagen + label + titulo). Props opcionales: `titleAccent` (dual-weight), `allowOverlap` (permite cards con `-mt-20`), `imagePosition` (custom object-position CSS)
 - `SectionHeading`: label + titulo + divisor reutilizable
 
 **Contenido por pagina:**
 - **Homepage**: hero full-screen, servicios (Domingo 3-5PM + Miercoles 7:30-9PM), ministerios preview, CTA
 - **Nosotros**: 3 pilares (Equipar/Enviar/Alcanzar), mision con parallax, pastores con stats
-- **Ministerios**: 4 cards (Hombres, Mujeres, Jovenes "Zoe Zone", Escuela Dominical) con fotos overlay
+- **Ministerios**: 5 cards (Hombres, Mujeres, Jovenes "Zoe Zone", Escuela Dominical, Adoracion) con fotos overlay + paginas individuales por ministerio (intro, 3 features, lider, CTA)
 - **Eventos**: calendario mensual con badges coloreados, lista de eventos, Google Calendar links
 - **Contacto**: 3 cards equal-height overlapping hero (telefono, email, direccion), formulario dark section con mailto
 - **Sermones**: featured sermon overlapping hero (2-col: imagen con play button + contenido), grid 3x2 con hover play overlay, series badge, metadata (speaker/date/duration)
 - **Testimonios**: quote intro section, grid 3x2 cards con fotos (aspect-[4/3]), category labels, "Read More →", CTA dark "Your Story Matters"
-- **Donar**: scripture quote (italic serif), 2-col layout: izq (3 formas de dar con iconos + bank details) / der (4 impact cards + dark thank-you box)
+- **Donar**: scripture quote (italic serif), 2-col layout: izq (3 formas de dar con iconos + 3 cuentas bancarias reales: Diezmos BSB 066-137 Acc 10092714, Pro Templo BSB 066-013 Acc 10355564, Jovenes con referencia) / der (4 impact cards + dark thank-you box)
 
 **Diseno:**
 - **Paleta**: parchment `#FAF8F5`, gold `#C9A86C`, dark brown `#4A3F35`, medium `#6B5D4D`
 - **Fuente**: Playfair Display (serif) para titulos, Geist (sans) heredado del root layout
 - **Animaciones**: CSS + IntersectionObserver (NO framer-motion para contenido — causa SSR blank)
 - **framer-motion**: SOLO para mobile menu AnimatePresence
-- Imagenes en `public/iglesia/` (23 archivos: hero, pastores, ministerios, worship, 6 sermon-*.jpg, 6 testimony-*.jpg de Pexels, etc.)
+- Imagenes en `public/iglesia/` (~30 archivos: hero, pastores, ministerios, worship, gallery, leaders, 6 sermon-*.jpg, 6 testimony-*.jpg de Pexels, etc.)
+- **IMPORTANTE — Imagenes repetidas**: Revisar que NO se reutilice la misma imagen en multiples paginas/secciones. Cada pagina y seccion debe tener su propia imagen unica. Antes de agregar una imagen, verificar que no este ya en uso en otra pagina. Usar `grep -r "src=\"/iglesia/" src/app/iglesia/` para auditar. Fotos stock de Pexels gratuitas (no usar fotos propias de la iglesia por falta de variedad).
 
 **Traducciones** (`src/lib/iglesia/translations.ts`):
-- 185+ keys organizados por seccion (nav, hero, services, vision, mission, ministries, pastors, events, contact, footer, sermons, testimonies, giving)
+- 265+ keys organizados por seccion (nav, hero, services, vision, mission, ministries, individual ministry pages, pastors, events, contact, footer, sermons, testimonies, giving)
 - `useLang()` hook retorna `{ lang, setLang, toggleLang }`
 
 ### Landing Page JEC Hub (`/`)
@@ -568,29 +582,67 @@ JEC Hub evolucionara a **JEC Platform** — plataforma centralizada de la iglesi
 - [x] Visual upgrade estilo Base44 (overlapping cards, dual-weight headings, pill buttons, gallery, 4-col footer)
 - [x] Paginas sermones, testimonios y donar (Base44 design, fotos stock de Pexels)
 - [x] Nav completo: 7 links + boton Give/Donar con Heart icon
+- [x] Paginas individuales por ministerio (hombres, mujeres, jovenes, ninos, adoracion) con intro, features, lider, CTA
+- [x] Reemplazo de imagenes repetidas en homepage, contacto y eventos con stock photos unicos
 
 ### Fase 2: Pendiente — Mejoras iglesia
-- [ ] Sermones: conectar a YouTube real (actualmente botones no linkean)
+- [ ] **AUDITORIA DE IMAGENES REPETIDAS**: Revisar TODAS las paginas y verificar que ninguna imagen se repita entre paginas o secciones. Actualmente `worship.jpg` aun se usa en nosotros (mision) y ministerios ("One Body"). Usar fotos unicas de Pexels para cada seccion. Comando para auditar: `grep -rn "iglesia/" src/app/iglesia/ | grep -E "\.(jpg|png|jpeg)" | sort`
+- [x] Sermones: YouTube embeds reales + Spotify podcasts + paginas individuales con notas
 - [ ] Testimonios: conectar a datos reales (actualmente placeholders estaticos)
 - [ ] Testimonios: pagina individual por testimonio (click "Read More" no navega)
-- [ ] Donar: agregar datos bancarios reales (BSB + Account actualmente "—")
+- [x] Donar: datos bancarios reales (3 cuentas: Diezmos, Pro Templo, Jovenes)
 - [ ] Donar: integrar plataforma de pagos online (Stripe/PayPal)
 - [ ] Contacto: backend real para formulario (actualmente usa mailto)
 - [ ] Fotos reales de la iglesia (reemplazar stock photos de Pexels por fotos propias)
 - [ ] SEO: meta tags por pagina, OpenGraph images, sitemap.xml
 - [ ] Performance: Next.js Image component (actualmente usa `<img>` tags)
 
-### Fase 3: Plataforma hub
+### Fase 3: CMS Backend (Gestion de Contenido desde el Hub)
+**Vision**: Cada pagina publica de la iglesia se puede editar desde el backend (hub), como un web builder.
+Los encargados de cada ministerio pueden gestionar su propia seccion.
+
+- [ ] **Tabla `church_content`** en Supabase: almacena textos, imagenes, videos editables por seccion/pagina
+  - Campos: `page` (string), `section` (string), `key` (string), `value_text`, `value_image_url`, `value_json`, `updated_by`, `updated_at`
+  - Cada pagina del frontend lee de esta tabla en vez de tener contenido hardcodeado
+- [ ] **CRUD de contenido** (`/api/content`): GET publico, PATCH por rol
+- [ ] **Editor inline en hub** (`/(app)/contenido`): formularios por pagina/seccion, preview en vivo
+- [ ] **Gestion de sermones**: tabla `sermons` (title, youtube_id, spotify_id, series, speaker, date, notes_content, status)
+  - Admin agrega YouTube link + notas → se refleja automaticamente en el frontend
+  - Reemplaza datos hardcodeados en sermones/page.tsx
+- [ ] **Gestion de podcasts**: tabla `podcasts` (title, spotify_id, series, duration, date)
+- [ ] **Gestion de testimonios**: tabla `testimonies` (name, category, quote, image_url, full_story, status)
+- [ ] **Gestion de donar**: datos bancarios editables desde el hub (BSB, cuenta, nombre)
+- [ ] **Gestion de imagenes**: upload de fotos desde el hub → Supabase Storage → se refleja en el frontend
+
+### Fase 4: Paneles Ministeriales + Roles Granulares
+**Vision**: Cada ministerio tiene su propio panel en el hub. Pastor Morris es admin global.
+
+**Roles y permisos**:
+- `pastor` (Morris Velasquez): admin global, aprueba todo, ve todo
+- `admin` (christian.mastro@gmail.com): power user, mismo acceso que pastor
+- `lider_ministerio`: puede editar SU ministerio (contenido, calendario, fotos)
+- `member`: solo ve contenido publicado
+
+**Paneles**:
+- [ ] **Panel Pastoral** (`/(app)/pastoral`): vista global de todos los ministerios, aprobaciones pendientes, calendario unificado
+- [ ] **Panel Ministerio Hombres** (`/(app)/ministerio/hombres`): Morris como lider
+- [ ] **Panel Ministerio Mujeres** (`/(app)/ministerio/mujeres`): Daisy como lider
+- [ ] **Panel Ministerio Jovenes** (`/(app)/ministerio/jovenes`): Raquel como lider (Zoe Zone)
+- [ ] **Panel Escuela Dominical** (`/(app)/ministerio/ninos`): Clara como lider
+- [ ] **Panel Adoracion** (`/(app)/ministerio/adoracion`): Ronal como lider (ya existe como musica)
+
+**Calendario por ministerio**:
+- [ ] Tabla `ministry_events` con campo `ministry` + `approved_by`
+- [ ] Cada ministerio crea sus eventos → pastor aprueba → se publican
+- [ ] Vista unificada en panel pastoral
+- [ ] Vista filtrada en panel de cada ministerio
+
+### Fase 5: Seguridad avanzada
+- [ ] Verificacion de email (Supabase lo soporta nativamente)
+- [ ] Verificacion de mobile (SMS via Supabase + Twilio)
+
+### Fase 6: Mejoras futuras
 - [ ] Dashboard post-login con acceso a ministerios
 - [ ] Mover rutas de musica bajo `/musica/*`
 - [ ] Soporte Espanol/Ingles en plataforma hub (~24 archivos)
 - [ ] Preferencia de idioma en perfil de usuario
-
-### Fase 4: Seguridad avanzada
-- [ ] Verificacion de email (Supabase lo soporta nativamente)
-- [ ] Verificacion de mobile (SMS via Supabase + Twilio)
-
-### Fase 5: Nuevos ministerios
-- [ ] Panel Ministerio Pastoral
-- [ ] Panel Ministerio de Jovenes
-- [ ] Sistema de roles por ministerio (admin de musica vs admin pastoral)

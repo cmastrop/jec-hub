@@ -136,39 +136,103 @@ export default function DonarPage() {
                 </div>
 
                 {/* Bank Transfer Details */}
-                <div className="mt-8 p-6 bg-white rounded-xl border border-[#E8E0D5]">
-                  <h3 className="font-semibold text-[#4A3F35] mb-4">
+                <div className="mt-8 space-y-4">
+                  <h3 className="font-semibold text-[#4A3F35]">
                     {lang === "en"
                       ? "Bank Transfer Details"
                       : "Datos para Transferencia"}
                   </h3>
-                  <div className="space-y-2 text-[#6B5D4D] text-sm">
-                    <p>
-                      <span className="font-medium">
-                        {lang === "en" ? "Bank:" : "Banco:"}
-                      </span>{" "}
-                      Commonwealth Bank
-                    </p>
-                    <p>
-                      <span className="font-medium">
-                        {lang === "en" ? "Account Name:" : "Nombre:"}
-                      </span>{" "}
-                      Jesus Es El Camino Church
-                    </p>
-                    <p>
-                      <span className="font-medium">BSB:</span> —
-                    </p>
-                    <p>
-                      <span className="font-medium">
-                        {lang === "en" ? "Account:" : "Cuenta:"}
-                      </span>{" "}
-                      —
-                    </p>
-                    <p className="text-xs text-[#6B5D4D]/60 mt-2 italic">
-                      {lang === "en"
-                        ? "Contact us for full bank details."
-                        : "Contáctanos para los datos bancarios completos."}
-                    </p>
+
+                  {/* General Tithes & Offerings */}
+                  <div className="p-5 bg-white rounded-xl border border-[#E8E0D5]">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-2 h-2 rounded-full bg-[#C9A86C]" />
+                      <h4 className="font-semibold text-[#4A3F35] text-sm">
+                        {lang === "en"
+                          ? "Tithes & Offerings"
+                          : "Diezmos y Ofrendas"}
+                      </h4>
+                    </div>
+                    <div className="space-y-1.5 text-[#6B5D4D] text-sm">
+                      <p>
+                        <span className="font-medium">
+                          {lang === "en" ? "Account Name:" : "Nombre:"}
+                        </span>{" "}
+                        Jesus Es El Camino
+                      </p>
+                      <p>
+                        <span className="font-medium">BSB:</span> 066-137
+                      </p>
+                      <p>
+                        <span className="font-medium">
+                          {lang === "en" ? "Account:" : "Cuenta:"}
+                        </span>{" "}
+                        1009 2714
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Building Fund / Pro Templo */}
+                  <div className="p-5 bg-white rounded-xl border border-[#E8E0D5]">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-2 h-2 rounded-full bg-[#6B8E23]" />
+                      <h4 className="font-semibold text-[#4A3F35] text-sm">
+                        {lang === "en"
+                          ? "Building Fund (Pro Templo)"
+                          : "Pro Templo"}
+                      </h4>
+                    </div>
+                    <div className="space-y-1.5 text-[#6B5D4D] text-sm">
+                      <p>
+                        <span className="font-medium">
+                          {lang === "en" ? "Account Name:" : "Nombre:"}
+                        </span>{" "}
+                        Jesus Es El Camino
+                      </p>
+                      <p>
+                        <span className="font-medium">BSB:</span> 066-013
+                      </p>
+                      <p>
+                        <span className="font-medium">
+                          {lang === "en" ? "Account:" : "Cuenta:"}
+                        </span>{" "}
+                        1035 5564
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Youth Ministry */}
+                  <div className="p-5 bg-white rounded-xl border border-[#E8E0D5]">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-2 h-2 rounded-full bg-[#8B5CF6]" />
+                      <h4 className="font-semibold text-[#4A3F35] text-sm">
+                        {lang === "en"
+                          ? "Youth Ministry (Zoe Zone)"
+                          : "Ministerio de Jovenes (Zoe Zone)"}
+                      </h4>
+                    </div>
+                    <div className="space-y-1.5 text-[#6B5D4D] text-sm">
+                      <p>
+                        <span className="font-medium">
+                          {lang === "en" ? "Account Name:" : "Nombre:"}
+                        </span>{" "}
+                        Jesus Es El Camino
+                      </p>
+                      <p>
+                        <span className="font-medium">BSB:</span> 066-137
+                      </p>
+                      <p>
+                        <span className="font-medium">
+                          {lang === "en" ? "Account:" : "Cuenta:"}
+                        </span>{" "}
+                        1009 2714
+                      </p>
+                      <p className="text-xs text-[#6B5D4D]/60 mt-1 italic">
+                        {lang === "en"
+                          ? "Use reference: YOUTH or ZOE ZONE"
+                          : "Usar referencia: JOVENES o ZOE ZONE"}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>

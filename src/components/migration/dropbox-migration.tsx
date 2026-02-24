@@ -36,6 +36,7 @@ export function DropboxMigration() {
     downloadRemaining: 0,
     processed: 0,
     processFailed: 0,
+    processRemaining: 0,
     dailyLimitReached: false,
   });
   const runningRef = useRef(false);
@@ -208,6 +209,7 @@ export function DropboxMigration() {
           ...s,
           processed: s.processed + data.processed,
           processFailed: s.processFailed + data.failed,
+          processRemaining: data.remaining ?? 0,
           dailyLimitReached: data.dailyLimitReached,
         }));
 
@@ -217,8 +219,8 @@ export function DropboxMigration() {
           return;
         }
 
-        // Check if there are more to process
-        if (data.processed > 0 || data.failed > 0) {
+        // Continue if there are remaining items to process
+        if (data.remaining > 0) {
           setTimeout(processBatch, 500);
         } else {
           setPhase("completed");
@@ -339,6 +341,11 @@ export function DropboxMigration() {
             total={stats.processableFiles}
             failed={stats.processFailed}
           />
+          {stats.processRemaining > 0 && (
+            <p className="text-xs text-gray-500 text-center">
+              {stats.processRemaining.toLocaleString()} archivos pendientes
+            </p>
+          )}
         </div>
       )}
 

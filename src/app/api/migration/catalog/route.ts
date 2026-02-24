@@ -37,7 +37,13 @@ export async function POST() {
       .eq("status", "downloaded");
 
     if ((pendingDownloads && pendingDownloads > 0) || (pendingProcess && pendingProcess > 0)) {
-      // Resume existing work
+      // Reset any items stuck in "processing" back to "pending"
+      await admin
+        .from("import_items")
+        .update({ status: "pending" })
+        .eq("status", "processing");
+
+      // Resume existing work — use the latest job
       const { data: existingJob } = await admin
         .from("import_jobs")
         .select("id")
@@ -65,10 +71,25 @@ export async function POST() {
         jobId = newJob?.id;
       }
 
+      // Consolidate: reassign ALL pending items from other jobs to the active job
+      if (jobId) {
+        await admin
+          .from("import_items")
+          .update({ job_id: jobId })
+          .eq("status", "pending")
+          .neq("job_id", jobId);
+      }
+
+      // Re-count pending after consolidation
+      const { count: consolidatedPending } = await admin
+        .from("import_items")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "pending");
+
       return NextResponse.json({
         jobId,
         totalFiles: totalCount || 0,
-        processableFiles: pendingProcess || 0,
+        processableFiles: consolidatedPending || 0,
         downloadRemaining: pendingDownloads || 0,
         downloaded: downloadedCount || 0,
         resumed: true,

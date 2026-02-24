@@ -1,6 +1,7 @@
 "use client";
 
-import { User, Calendar, Music } from "lucide-react";
+import Link from "next/link";
+import { User, Calendar, Music, FileText } from "lucide-react";
 import { useLang } from "@/lib/iglesia/use-lang";
 import { translations } from "@/lib/iglesia/translations";
 import { FadeIn } from "@/components/iglesia/fade-in";
@@ -20,6 +21,7 @@ export default function SermonesPage() {
       speaker: l.sermonsPastorMorris,
       date: lang === "en" ? "Sep 21, 2025" : "21 Sep 2025",
       youtubeId: "UYkCTuR5aBQ",
+      slug: "la-epoca-dorada-del-matrimonio",
     },
     {
       title: l.sermon2Title,
@@ -28,6 +30,7 @@ export default function SermonesPage() {
       speaker: l.sermonsPastorMorris,
       date: lang === "en" ? "Sep 6, 2017" : "6 Sep 2017",
       youtubeId: "reTiSkwk_oU",
+      slug: "el-don-de-la-sabiduria",
     },
     {
       title: l.sermon3Title,
@@ -36,6 +39,7 @@ export default function SermonesPage() {
       speaker: l.sermonsPastorMorris,
       date: "",
       youtubeId: "zD_bPrkJ2uo",
+      slug: "el-arbol-de-la-vida",
     },
   ];
 
@@ -108,7 +112,7 @@ export default function SermonesPage() {
                     {featured.title}
                   </h2>
                   <p className="text-[#6B5D4D] mb-6">{featured.desc}</p>
-                  <div className="flex flex-wrap gap-4 text-sm text-[#6B5D4D]">
+                  <div className="flex flex-wrap gap-4 text-sm text-[#6B5D4D] mb-4">
                     <span className="flex items-center gap-1">
                       <User className="w-4 h-4" />
                       {featured.speaker}
@@ -120,6 +124,13 @@ export default function SermonesPage() {
                       </span>
                     )}
                   </div>
+                  <Link
+                    href={`/iglesia/sermones/${featured.slug}`}
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-[#C9A86C] hover:text-[#4A3F35] transition-colors"
+                  >
+                    <FileText className="w-4 h-4" />
+                    {lang === "en" ? "Read Sermon Notes" : "Leer Notas del Sermon"}
+                  </Link>
                 </div>
               </div>
             </div>
@@ -156,17 +167,26 @@ export default function SermonesPage() {
                     <p className="text-[#6B5D4D] text-sm mb-4 line-clamp-2 flex-1">
                       {sermon.desc}
                     </p>
-                    <div className="flex flex-wrap gap-3 text-xs text-[#6B5D4D]">
-                      <span className="flex items-center gap-1">
-                        <User className="w-3 h-3" />
-                        {sermon.speaker.split(" ").slice(0, 2).join(" ")}
-                      </span>
-                      {sermon.date && (
+                    <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[#6B5D4D]">
+                      <div className="flex flex-wrap gap-3">
                         <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          {sermon.date}
+                          <User className="w-3 h-3" />
+                          {sermon.speaker.split(" ").slice(0, 2).join(" ")}
                         </span>
-                      )}
+                        {sermon.date && (
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {sermon.date}
+                          </span>
+                        )}
+                      </div>
+                      <Link
+                        href={`/iglesia/sermones/${sermon.slug}`}
+                        className="flex items-center gap-1 font-semibold text-[#C9A86C] hover:text-[#4A3F35] transition-colors"
+                      >
+                        <FileText className="w-3 h-3" />
+                        {lang === "en" ? "Notes" : "Notas"}
+                      </Link>
                     </div>
                   </div>
                 </div>
