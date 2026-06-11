@@ -38,8 +38,11 @@ export async function GET(request: NextRequest) {
     query = query.eq("status", "published");
   }
 
-  if (from) query = query.gte("event_date", from);
+  // Filtro por rango con solapamiento: un evento entra si empieza antes (o en) `to`
+  // y termina después (o en) `from`. Para eventos de un solo día, end_date es null,
+  // así que se compara contra event_date.
   if (to) query = query.lte("event_date", to);
+  if (from) query = query.or(`end_date.gte.${from},and(end_date.is.null,event_date.gte.${from})`);
 
   const { data, error } = await query;
 
@@ -71,7 +74,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { title, description, event_date, start_time, end_time, location, event_type, status, recurring, recurring_day } = body;
+  const { title, description, event_date, end_date, start_time, end_time, location, event_type, status, recurring, recurring_day } = body;
 
   if (!title || !event_date) {
     return NextResponse.json({ error: "Título y fecha son requeridos" }, { status: 400 });
@@ -83,6 +86,7 @@ export async function POST(request: NextRequest) {
       title,
       description: description || null,
       event_date,
+      end_date: end_date || null,
       start_time: start_time || null,
       end_time: end_time || null,
       location: location || "73 Nollamara Ave, Nollamara WA 6061",

@@ -8,8 +8,9 @@ import { FadeIn } from "@/components/iglesia/fade-in";
 import { PageHero } from "@/components/iglesia/page-hero";
 
 const serif = { fontFamily: "var(--font-playfair), Georgia, serif" };
-const YOUTUBE_CHANNEL = "iglesiacristianajesuseselc6023";
-const YOUTUBE_CHANNEL_URL = `https://www.youtube.com/@${YOUTUBE_CHANNEL}`;
+const YOUTUBE_CHANNEL_ID = "UChDID8HMZhz_VbzcU9U78lg";
+const YOUTUBE_HANDLE = "iglesiacristianajesuseselc6023";
+const YOUTUBE_CHANNEL_URL = `https://www.youtube.com/@${YOUTUBE_HANDLE}`;
 
 export default function EnVivoPage() {
   const { lang } = useLang();
@@ -33,7 +34,7 @@ export default function EnVivoPage() {
               {/* YouTube Embed */}
               <div className="aspect-video relative bg-[#1a1510]">
                 <iframe
-                  src={`https://www.youtube.com/embed/live_stream?channel=${YOUTUBE_CHANNEL}&autoplay=0`}
+                  src={`https://www.youtube.com/embed/live_stream?channel=${YOUTUBE_CHANNEL_ID}&autoplay=0`}
                   title="Live Stream"
                   className="w-full h-full"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

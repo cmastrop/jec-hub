@@ -88,6 +88,7 @@ export interface ChurchEvent {
   title: string;
   description: string | null;
   event_date: string;
+  end_date: string | null; // fecha de fin para eventos multi-día (null = un solo día)
   start_time: string | null;
   end_time: string | null;
   location: string | null;

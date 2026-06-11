@@ -45,6 +45,7 @@ const defaultForm = {
   title: "",
   description: "",
   event_date: "",
+  end_date: "",
   start_time: "",
   end_time: "",
   location: "73 Nollamara Ave, Nollamara WA 6061",
@@ -115,6 +116,7 @@ export default function EventosPage() {
 
     const body = {
       ...form,
+      end_date: form.end_date || null,
       recurring_day: form.recurring ? form.recurring_day : null,
     };
 
@@ -190,6 +192,7 @@ export default function EventosPage() {
       title: ev.title,
       description: ev.description || "",
       event_date: ev.event_date,
+      end_date: ev.end_date || "",
       start_time: ev.start_time || "",
       end_time: ev.end_time || "",
       location: ev.location || "",
@@ -299,13 +302,26 @@ export default function EventosPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Fecha *
+                Fecha {form.end_date ? "inicio" : ""} *
               </label>
               <input
                 type="date"
                 value={form.event_date}
                 onChange={(e) => setForm({ ...form, event_date: e.target.value })}
                 required
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Fecha fin <span className="text-gray-400 font-normal">(opcional, multi-día)</span>
+              </label>
+              <input
+                type="date"
+                value={form.end_date}
+                min={form.event_date || undefined}
+                onChange={(e) => setForm({ ...form, end_date: e.target.value })}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               />
             </div>
@@ -514,6 +530,15 @@ function EventCard({
     month: "short",
     year: "numeric",
   });
+  const endFormatted =
+    event.end_date && event.end_date !== event.event_date
+      ? new Date(event.end_date + "T00:00:00").toLocaleDateString("es-ES", {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        })
+      : null;
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -543,8 +568,8 @@ function EventCard({
             </span>
           </div>
           <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
-            <span className="sm:hidden">{dateFormatted}</span>
-            <span className="hidden sm:inline">{dateFormatted}</span>
+            <span className="sm:hidden">{dateFormatted}{endFormatted ? ` – ${endFormatted}` : ""}</span>
+            <span className="hidden sm:inline">{dateFormatted}{endFormatted ? ` – ${endFormatted}` : ""}</span>
             {event.start_time && (
               <span className="flex items-center gap-1">
                 <Clock className="w-3.5 h-3.5" />

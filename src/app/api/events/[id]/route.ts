@@ -47,7 +47,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   const body = await request.json();
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
 
-  const allowedFields = ["title", "description", "event_date", "start_time", "end_time", "location", "event_type", "status", "recurring", "recurring_day"];
+  const allowedFields = ["title", "description", "event_date", "end_date", "start_time", "end_time", "location", "event_type", "status", "recurring", "recurring_day"];
   for (const field of allowedFields) {
     if (body[field] !== undefined) {
       updates[field] = body[field];

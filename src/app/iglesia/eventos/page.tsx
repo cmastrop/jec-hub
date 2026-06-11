@@ -63,11 +63,17 @@ export default function EventosPage() {
   };
 
   const buildGoogleCalUrl = (ev: ChurchEvent) => {
-    const date = ev.event_date.replace(/-/g, "");
+    const start = ev.event_date.replace(/-/g, "");
+    // Google usa fecha de fin EXCLUSIVA para eventos de día completo,
+    // así que sumamos un día al end_date (o al start si es de un solo día).
+    const endSource = ev.end_date || ev.event_date;
+    const endExclusive = new Date(endSource + "T12:00:00");
+    endExclusive.setDate(endExclusive.getDate() + 1);
+    const end = `${endExclusive.getFullYear()}${String(endExclusive.getMonth() + 1).padStart(2, "0")}${String(endExclusive.getDate()).padStart(2, "0")}`;
     const params = new URLSearchParams({
       action: "TEMPLATE",
       text: ev.title,
-      dates: `${date}/${date}`,
+      dates: `${start}/${end}`,
       details: ev.description || "",
       location: ev.location || "73 Nollamara Ave, Nollamara WA 6061",
     });
@@ -86,7 +92,13 @@ export default function EventosPage() {
 
   const getEventsForDay = (day: number) => {
     const dateStr = `${eventsMonth.year}-${String(eventsMonth.month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    return events.filter((e) => e.event_date === dateStr);
+    // Un evento se muestra en el día si la fecha cae dentro de su rango
+    // [event_date, end_date]. Para eventos de un solo día, end_date es null.
+    return events.filter((e) => {
+      const start = e.event_date;
+      const end = e.end_date || e.event_date;
+      return dateStr >= start && dateStr <= end;
+    });
   };
 
   const isToday = (day: number) => {
@@ -240,6 +252,15 @@ export default function EventosPage() {
                             {ev.title}
                           </h4>
                           <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-[#6B5D4D]">
+                            {ev.end_date && ev.end_date !== ev.event_date && (
+                              <span className="flex items-center gap-1 font-medium">
+                                <Calendar className="w-3.5 h-3.5 text-[#C9A86C]" />
+                                {new Date(ev.event_date + "T12:00:00").getDate()}
+                                {" – "}
+                                {new Date(ev.end_date + "T12:00:00").getDate()}{" "}
+                                {l.eventsMonths[new Date(ev.end_date + "T12:00:00").getMonth()]?.substring(0, 3)}
+                              </span>
+                            )}
                             {ev.start_time && (
                               <span className="flex items-center gap-1">
                                 <Clock className="w-3.5 h-3.5 text-[#C9A86C]" />
