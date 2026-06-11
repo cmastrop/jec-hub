@@ -9,6 +9,7 @@ export async function GET(request: Request) {
     const status = searchParams.get("status") || "published";
     const artist = searchParams.get("artist") || "";
     const sourceType = searchParams.get("source_type") || "";
+    const tag = searchParams.get("tag") || "";
     const sort = searchParams.get("sort") || "title";
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "20");
@@ -43,6 +44,10 @@ export async function GET(request: Request) {
 
     if (sourceType) {
       query = query.eq("source_type", sourceType);
+    }
+
+    if (tag) {
+      query = query.contains("tags", [tag]);
     }
 
     // Sort

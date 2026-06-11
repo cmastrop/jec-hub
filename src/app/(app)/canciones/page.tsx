@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Plus, Search, Music, Trash2, Filter, X, CheckSquare, Square, AlertTriangle } from "lucide-react";
+import { Plus, Search, Music, Trash2, Filter, X, CheckSquare, Square, AlertTriangle, Users, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils/cn";
 import { useUser } from "@/hooks/use-user";
@@ -198,6 +198,34 @@ export default function CancionesPage() {
             </Link>
           )}
         </div>
+      </div>
+
+      {/* Browse by artist / category */}
+      <div className="flex gap-3">
+        <Link
+          href="/canciones/artistas"
+          className="flex-1 flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 hover:border-primary/50 hover:shadow-sm transition-all"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 shrink-0">
+            <Users className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-foreground text-sm">Por Artista</h3>
+            <p className="text-xs text-gray-500">Navega por artista</p>
+          </div>
+        </Link>
+        <Link
+          href="/canciones/categorias"
+          className="flex-1 flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-4 hover:border-primary/50 hover:shadow-sm transition-all"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 shrink-0">
+            <FolderOpen className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-foreground text-sm">Por Categoria</h3>
+            <p className="text-xs text-gray-500">Adoracion, Cantautores, Worship...</p>
+          </div>
+        </Link>
       </div>
 
       {/* Search + filter toggle */}
