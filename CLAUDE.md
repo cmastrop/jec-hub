@@ -62,6 +62,10 @@ src/
         [id]/page.tsx    # Detalle: canciones con drag-and-drop, edicion, eliminacion
       calendario/        # Calendario conectado a programas reales
       eventos/           # Gestion de eventos iglesia (admin: crear/aprobar/publicar/editar/eliminar)
+      ministerios/       # CMS por ministerio (pastor/admin/lider_ministerio)
+        page.tsx         # Grid de ministerios segun rol del usuario
+        [slug]/page.tsx  # Overview del ministerio (links a contenido, eventos proximamente)
+        [slug]/contenido/page.tsx  # Block editor de la pagina publica del ministerio
       equipo/            # Gestion de equipo y roles (admin only)
       importar/          # Pagina de importacion (upload individual + Dropbox)
       ajustes/           # Ajustes del usuario (persistidos en Supabase)
@@ -77,6 +81,12 @@ src/
       events/            # Eventos publicos de la iglesia
         route.ts         # GET publico (published) / POST crear (admin)
         [id]/route.ts    # GET/PATCH/DELETE evento individual (admin)
+      cms/               # CMS block editor (Fase 3b)
+        blocks/route.ts  # GET bloques (publico published / ?all=true editor) / POST crear
+        blocks/[id]/route.ts      # PATCH contenido-estado / DELETE bloque
+        blocks/reorder/route.ts   # PATCH orden tras drag-and-drop
+        media/route.ts   # GET lista / POST upload imagen a bucket cms-media
+      ministries/route.ts # GET lista de ministerios activos (auth)
       songs/             # CRUD de canciones
         [id]/
           route.ts       # GET/PATCH/DELETE una cancion
@@ -116,8 +126,14 @@ src/
       file-upload.tsx            # Componente upload con selector AI provider
     setlist/
       song-search-modal.tsx      # Modal busqueda canciones para agregar a setlist
+    cms/                           # Componentes del block editor (Fase 3b)
+      block-editor.tsx             # Editor: lista sortable (dnd-kit), agregar/editar/publicar/eliminar
+      block-form.tsx               # Formulario por tipo de bloque con tabs ES/EN + media picker
+      block-renderer.tsx           # Renderiza los 9 tipos de bloque con diseno iglesia
+      media-picker.tsx             # Modal eleccion/upload de imagenes (bucket cms-media)
     iglesia/                       # Componentes compartidos pagina iglesia
       church-shell.tsx             # Client wrapper: LangContext provider + header + footer
+      dynamic-blocks.tsx           # Renderiza bloques CMS published; fallback a children (hardcodeado)
       church-header.tsx            # Sticky nav con 7 links + Give CTA dorado, transparent/opaque segun pathname
       church-footer.tsx            # Footer con traducciones bilingues
       fade-in.tsx                  # Scroll animations: fade-up, fade-left, fade-right, scale-in (CSS + IntersectionObserver)
@@ -131,6 +147,8 @@ src/
       header.tsx                 # Header con menu de usuario + badge admin
     ui/                          # Componentes base (button, input, card, etc.)
   lib/
+    auth/
+      permissions.ts     # requireAuth / requireRole / requireMinistryAccess (server-side)
     ai/
       types.ts           # AIProvider, ExtractionResult, AIExtractor interface
       gemini-adapter.ts  # Adapter Gemini (wraps lib/gemini/extract)
@@ -161,6 +179,7 @@ src/
       utils.ts           # RateLimiter, getFileType, toStoragePath, isProcessableByGemini
     types/
       database.ts        # Song, Profile, Setlist, SetlistSong, ImportJob, ImportItem, DropboxToken, MigratedFile, ChurchEvent
+      cms.ts             # Ministry, MinistryMember, PageBlock (BlockType), PageMedia, Sermon, Podcast
   hooks/
     use-user.ts          # Hook para perfil/rol del usuario (cached, clearUserCache)
 scripts/
@@ -188,6 +207,7 @@ NEXT_PUBLIC_DROPBOX_APP_KEY    # Dropbox app key (4b1t5mpw1vqxfp4)
 DROPBOX_APP_SECRET             # Dropbox app secret (DEBE tener valor, no vacio)
 NEXT_PUBLIC_APP_URL            # URL de la app (produccion: https://hub.jesuseselcamino.com.au)
 CRON_SECRET                    # Secret para cron jobs
+SUPABASE_ACCESS_TOKEN          # Token Management API (solo local, para ejecutar SQL via api.supabase.com)
 ```
 
 **IMPORTANTE**: En Vercel, asegurar que las variables no tengan `\n` al final (causa errores como `Invalid client_id`).
@@ -214,8 +234,19 @@ CRON_SECRET                    # Secret para cron jobs
 - `tags` (text[]), `created_by`, `created_at`, `updated_at`
 
 ### Tabla `profiles`
-- `id` (uuid, FK auth.users), `email`, `full_name`, `role` ("admin" | "member")
+- `id` (uuid, FK auth.users), `email`, `full_name`, `role` ("pastor" | "admin" | "lider_ministerio" | "member")
 - `avatar_url`, `notation_preference` ("letter" | "solfege"), `font_size_preference` (int)
+
+### Tablas CMS (Fase 3 — creadas y aplicadas en produccion 2026-06-11)
+Migracion: `supabase/migrations/20260611000000_cms_foundation.sql` (idempotente)
+- `ministries`: slug UNIQUE, name_en/es, leader_name, leader_user_id, image_url, description_en/es, active. Seed: hombres (Morris), mujeres (Daisy), jovenes (Raquel), ninos (Clara), adoracion (Ronal)
+- `ministry_members`: ministry_id + user_id UNIQUE, role ("lider" | "colaborador" | "miembro")
+- `page_blocks`: page_slug, ministry_id, block_type (9 tipos), position, content_en/content_es (jsonb), status ("draft" | "published")
+- `page_media`: storage_path UNIQUE (bucket `cms-media`), alt_text, uploaded_by
+- `sermons`: slug UNIQUE, title, speaker, youtube_id, spotify_id, series, blog_content, status (para Fase 3c)
+- `podcasts`: title, spotify_episode_id, published_date, status (para Fase 3c)
+- `church_events.ministry_id` (FK ministries) agregada
+- RLS: SELECT publico solo para published en page_blocks/sermons/podcasts; el resto solo service role
 
 ### Tabla `setlists`
 - `id` (uuid), `title`, `service_type` (domingo/miercoles/jovenes/oracion/especial/otro)
@@ -279,6 +310,10 @@ ALTER TABLE church_events ENABLE ROW LEVEL SECURITY;
 ### Storage Bucket: `originals`
 - Archivos originales importados (PDFs, imagenes) desde Dropbox o upload individual
 
+### Storage Bucket: `cms-media` (publico)
+- Imagenes subidas desde el CMS (media picker). Cada upload se registra en `page_media`
+- URL publica: `{SUPABASE_URL}/storage/v1/object/public/cms-media/{path}`
+
 ## Dropbox OAuth (Conexion Permanente)
 
 ### Flujo
@@ -324,6 +359,11 @@ Capa de abstraccion en `src/lib/ai/`:
 Ambos usan el mismo prompt de extraccion (definido en `src/lib/gemini/prompts.ts`).
 
 ## Roles y Permisos
+
+**4 niveles desde Fase 3a** (2026-06-11): `pastor` > `admin` > `lider_ministerio` > `member`.
+- `pastor` y `admin` tienen acceso global identico (`isAdmin` retorna true para ambos)
+- `lider_ministerio` edita el contenido CMS de SU ministerio (segun `ministry_members` con role lider/colaborador)
+- PENDIENTE: asignar roles reales en produccion (todos los perfiles siguen como admin/member)
 
 ### Administrador
 Cuentas admin: `christian.mastro@gmail.com`, `musicosjesuseselcamino@gmail.com`
@@ -520,6 +560,14 @@ Permisos:
 - Diseno split-screen con imagen de adoracion
 - Responsive (stacked en mobile, side-by-side en desktop)
 
+## Estado de la Sesion (2026-06-11) — Para Retomar
+
+- **10 commits locales SIN PUSHEAR** (`cb3a516..` hasta el ultimo): la red corporativa bloquea github.com y api.vercel.com (timeout TCP 443). Desde otra red: `git push origin master` + `npx vercel --prod`
+- **Produccion DB ya actualizada**: migracion CMS aplicada via Management API (`api.supabase.com` SI funciona desde la red corporativa; token en `.env.local` como `SUPABASE_ACCESS_TOKEN`)
+- **OJO**: el CLI de Supabase local quedo linkeado a heavensglow-v2 (`supabase/.temp/project-ref` = `hkukiapttwkqrhylogig`), NO usar `supabase db push` sin re-linkear a `avowxrzsqgetktqrefxa`
+- **Truco PowerShell 5.1 + Management API**: leer SQL con `[System.IO.File]::ReadAllText(path, UTF8)`, castear `[string]$sql.ToString()` antes de ConvertTo-Json, y enviar bytes UTF-8 con `-ContentType "application/json; charset=utf-8"`
+- **Proximos pasos**: 1) push + deploy, 2) asignar roles reales (pastor/lideres), 3) Fase 3c (sermones/podcasts), 4) reemplazar 7 imagenes repetidas (auditoria hecha: worship.jpg x3, preaching.jpg x5, 5 fotos ministerio duplicadas homepage-preview vs hero; huerfanas reutilizables: speaker.jpg, worship-hands.jpg, sermon-1/2/4/5/6.jpg)
+
 ## Deploy
 
 - **Plataforma**: Vercel (proyecto `jec-hub` en team `cmastrops-projects`)
@@ -645,8 +693,7 @@ JEC Hub evolucionara a **JEC Platform** — plataforma centralizada de la iglesi
 
 **Vision**: Cada pagina publica de la iglesia se puede editar desde el backend (hub), como un web builder con bloques arrastrables. Cada ministerio gestiona su propia seccion. Pastor Morris aprueba todo.
 
-**Estado**: Plan aprobado, implementacion pendiente (commit backup: `21a7f14`).
-**Plan completo**: `.claude/plans/prancy-herding-hoare.md`
+**Estado**: Fases 3a y 3b COMPLETADAS (2026-06-11). Migracion aplicada en produccion, block editor funcionando. Siguiente: Fase 3c (sermones/podcasts).
 
 #### Base de datos (6 tablas nuevas + 2 modificaciones)
 
@@ -688,13 +735,14 @@ Cada bloque guarda `content_en` y `content_es` como JSONB (maxima flexibilidad p
 
 #### Sub-fases de implementacion
 
-**Fase 3a: Foundation (DB + Roles + Auth)**
-- [ ] SQL migration: CREATE 6 tablas + ALTER profiles + ALTER church_events
-- [ ] `src/lib/auth/permissions.ts` — helpers: requireAuth(), requireRole(), requireMinistryAccess()
-- [ ] Actualizar `src/lib/types/database.ts` — interfaces Ministry, PageBlock, PageMedia, Sermon, Podcast, MinistryMember
-- [ ] Actualizar `src/hooks/use-user.ts` — exponer role completo, ministry assignments, isPastor, isLeader, canManage(slug)
-- [ ] Actualizar `src/app/api/me/route.ts` — join con ministry_members, retornar assignments
-- [ ] Actualizar sidebar con nav links condicionales por rol
+**Fase 3a: Foundation (DB + Roles + Auth) — COMPLETADA 2026-06-11**
+- [x] SQL migration: CREATE 6 tablas + ALTER profiles + ALTER church_events (`supabase/migrations/20260611000000_cms_foundation.sql`, APLICADA en produccion via Management API)
+- [x] `src/lib/auth/permissions.ts` — requireAuth(), requireRole(), requireMinistryAccess(); retornan union discriminada `{ok:true,user,profile} | {ok:false,response}`
+- [x] Tipos CMS en `src/lib/types/cms.ts` (Ministry, PageBlock, PageMedia, Sermon, Podcast, MinistryMember) + `Profile.role` expandido en database.ts
+- [x] `src/hooks/use-user.ts` — expone role, ministries, isPastor, isLeader, canManage(slug); isAdmin = pastor|admin (backward compatible)
+- [x] `src/app/api/me/route.ts` — join con ministry_members, retorna assignments
+- [x] Sidebar con link "Ministerios" condicional por rol (pastor/admin/lider_ministerio)
+- [ ] PENDIENTE: asignar roles reales en produccion (Morris → pastor; lideres → lider_ministerio + fila en ministry_members)
 
 **Fase 3b: Block Editor + Ministry Pages (COMPLETADA 2026-06-11)**
 - [x] API routes: `/api/cms/blocks`, `/api/cms/blocks/[id]`, `/api/cms/blocks/reorder`, `/api/cms/media`, `/api/ministries`
