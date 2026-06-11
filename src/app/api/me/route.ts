@@ -24,10 +24,16 @@ export async function GET() {
         email: user.email,
         full_name: user.user_metadata?.full_name || null,
         role: "member",
+        ministries: [],
       });
     }
 
-    return NextResponse.json(profile);
+    const { data: memberships } = await admin
+      .from("ministry_members")
+      .select("role, ministry:ministries(id, slug, name_en, name_es)")
+      .eq("user_id", user.id);
+
+    return NextResponse.json({ ...profile, ministries: memberships ?? [] });
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : String(err) },

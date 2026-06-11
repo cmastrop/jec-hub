@@ -48,7 +48,7 @@ export interface Profile {
   id: string;
   email: string;
   full_name: string | null;
-  role: "admin" | "member";
+  role: "pastor" | "admin" | "lider_ministerio" | "member";
   avatar_url: string | null;
   notation_preference: "letter" | "solfege";
   font_size_preference: number;
