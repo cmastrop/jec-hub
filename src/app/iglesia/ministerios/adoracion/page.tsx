@@ -6,6 +6,7 @@ import { useLang } from "@/lib/iglesia/use-lang";
 import { translations } from "@/lib/iglesia/translations";
 import { FadeIn } from "@/components/iglesia/fade-in";
 import { PageHero } from "@/components/iglesia/page-hero";
+import { DynamicBlocks } from "@/components/iglesia/dynamic-blocks";
 
 const serif = { fontFamily: "var(--font-playfair), Georgia, serif" };
 
@@ -20,7 +21,7 @@ export default function WorshipMinistryPage() {
   ];
 
   return (
-    <>
+    <DynamicBlocks pageSlug="ministerios/adoracion">
       <PageHero
         image="/iglesia/worship-team.jpg"
         label={l.worshipPageLabel}
@@ -114,6 +115,6 @@ export default function WorshipMinistryPage() {
           </FadeIn>
         </div>
       </section>
-    </>
+    </DynamicBlocks>
   );
 }

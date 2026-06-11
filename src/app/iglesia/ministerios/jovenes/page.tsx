@@ -6,6 +6,7 @@ import { useLang } from "@/lib/iglesia/use-lang";
 import { translations } from "@/lib/iglesia/translations";
 import { FadeIn } from "@/components/iglesia/fade-in";
 import { PageHero } from "@/components/iglesia/page-hero";
+import { DynamicBlocks } from "@/components/iglesia/dynamic-blocks";
 
 const serif = { fontFamily: "var(--font-playfair), Georgia, serif" };
 
@@ -20,7 +21,7 @@ export default function YouthMinistryPage() {
   ];
 
   return (
-    <>
+    <DynamicBlocks pageSlug="ministerios/jovenes">
       <PageHero
         image="/iglesia/youth.jpg"
         label={l.youthPageLabel}
@@ -117,6 +118,6 @@ export default function YouthMinistryPage() {
           </FadeIn>
         </div>
       </section>
-    </>
+    </DynamicBlocks>
   );
 }

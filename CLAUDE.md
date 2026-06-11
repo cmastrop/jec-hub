@@ -696,13 +696,16 @@ Cada bloque guarda `content_en` y `content_es` como JSONB (maxima flexibilidad p
 - [ ] Actualizar `src/app/api/me/route.ts` — join con ministry_members, retornar assignments
 - [ ] Actualizar sidebar con nav links condicionales por rol
 
-**Fase 3b: Block Editor + Ministry Pages**
-- [ ] API routes: `/api/cms/blocks`, `/api/cms/blocks/[id]`, `/api/cms/blocks/reorder`, `/api/cms/media`, `/api/ministries`
-- [ ] Componentes CMS: block-editor.tsx (con @dnd-kit), sortable-block.tsx, block-form.tsx, 9 block renderers
-- [ ] Media picker modal (upload/seleccion de imagenes)
-- [ ] Hub pages: `/(app)/ministerios`, `/(app)/ministerios/[slug]`, `/(app)/ministerios/[slug]/contenido`
-- [ ] Rendering publico dinamico: `dynamic-page.tsx` + `dynamic-block.tsx`
-- [ ] Fallback: pagina sin bloques en DB → muestra contenido hardcodeado actual
+**Fase 3b: Block Editor + Ministry Pages (COMPLETADA 2026-06-11)**
+- [x] API routes: `/api/cms/blocks`, `/api/cms/blocks/[id]`, `/api/cms/blocks/reorder`, `/api/cms/media`, `/api/ministries`
+- [x] Componentes CMS: `block-editor.tsx` (con @dnd-kit, incluye SortableBlockRow), `block-form.tsx` (tabs ES/EN, campos por tipo), `block-renderer.tsx` (9 tipos, estilo iglesia)
+- [x] Media picker modal (`media-picker.tsx`): upload a bucket `cms-media` (publico) + seleccion
+- [x] Hub pages: `/(app)/ministerios` (grid por rol), `/(app)/ministerios/[slug]` (overview), `/(app)/ministerios/[slug]/contenido` (block editor)
+- [x] Rendering publico dinamico: `dynamic-blocks.tsx` (fetch bloques published + BlockRenderer)
+- [x] Fallback: pagina sin bloques publicados → muestra contenido hardcodeado actual (las 5 paginas de ministerio publicas envueltas en `<DynamicBlocks>`)
+- [x] Sidebar: link "Ministerios" visible solo para pastor/admin/lider_ministerio
+- **Permisos de edicion**: paginas `ministerios/<slug>` → requireMinistryAccess(slug); el resto → solo pastor/admin
+- **Storage**: bucket `cms-media` (publico) creado en produccion; tabla `page_media` registra cada upload
 
 **Fase 3c: Sermons + Podcasts**
 - [ ] Tablas `sermons` + `podcasts` con seed de datos actuales

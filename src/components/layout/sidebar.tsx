@@ -13,9 +13,11 @@ import {
   Users,
   Settings,
   LogOut,
+  Church,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { createClient } from "@/lib/supabase/client";
+import { useUser } from "@/hooks/use-user";
 
 const navLinks = [
   { href: "/canciones", label: "Canciones", icon: Music },
@@ -30,7 +32,17 @@ const navLinks = [
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { isAdmin, isLeader } = useUser();
   const [userName, setUserName] = useState("");
+
+  // Ministerios (CMS) solo para pastor/admin/lideres de ministerio
+  const links = isAdmin || isLeader
+    ? [
+        ...navLinks.slice(0, 4),
+        { href: "/ministerios", label: "Ministerios", icon: Church },
+        ...navLinks.slice(4),
+      ]
+    : navLinks;
 
   useEffect(() => {
     const supabase = createClient();
@@ -64,7 +76,7 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-4 space-y-1">
-        {navLinks.map((link) => {
+        {links.map((link) => {
           const isActive = pathname.startsWith(link.href);
           const Icon = link.icon;
 
