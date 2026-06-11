@@ -37,6 +37,7 @@ src/
         ninos/page.tsx     # Escuela Dominical: intro, features, lider, CTA
         adoracion/page.tsx # Equipo de Adoracion: intro, features, lider, CTA
       eventos/page.tsx   # Eventos: calendario publico + lista de eventos
+      en-vivo/page.tsx   # Live stream: YouTube embed (channel ID UChDID8HMZhz_VbzcU9U78lg) + horarios + CTA subscribe
       contacto/page.tsx  # Contacto: 3 info cards overlapping + formulario
       sermones/page.tsx  # Sermones: featured + grid con YouTube embeds + Spotify podcasts
         la-epoca-dorada-del-matrimonio/page.tsx  # Blog: sermon notes (Family & Faith)
@@ -51,6 +52,10 @@ src/
     (app)/               # Layout principal con sidebar (requiere auth)
       canciones/         # Biblioteca de canciones
         [id]/page.tsx    # Vista detalle: ChordPro viewer + editor estructurado + ver original
+        artistas/page.tsx       # Lista de artistas con conteo de canciones
+        artistas/[artist]/page.tsx  # Canciones filtradas por artista
+        categorias/page.tsx     # Lista de categorias con iconos y descripciones
+        categorias/[category]/page.tsx  # Canciones filtradas por categoria
         duplicados/      # Deteccion y gestion de canciones duplicadas (admin)
       programas/         # Programas de culto (setlists)
         page.tsx         # Lista de programas con filtros y creacion
@@ -79,6 +84,8 @@ src/
         import/route.ts  # POST importar archivo individual con AI
         bulk/route.ts    # PATCH publicacion/estado masivo (admin)
         duplicates/      # GET deteccion de duplicados (admin)
+        artists/route.ts # GET lista de artistas con conteo de canciones
+        categories/route.ts # GET canciones agrupadas por tags/categorias
         route.ts         # GET lista de canciones (con filtros avanzados)
       setlists/          # CRUD de programas de culto
         route.ts         # GET lista / POST crear setlist
@@ -130,7 +137,7 @@ src/
       claude-adapter.ts  # Adapter Claude (Anthropic SDK)
       index.ts           # Factory getAIExtractor() + re-exports
     chordpro/
-      parser.ts          # Parsea ChordPro string -> ChordProSong
+      parser.ts          # Parsea ChordPro string -> ChordProSong (auto-merge chord+text lines)
       serializer.ts      # Serializa ChordProSong -> ChordPro string
       transpose.ts       # Transposicion de acordes
       chord-position.ts  # Utilidades para mover/agregar/eliminar acordes posicionalmente
@@ -158,6 +165,15 @@ src/
     use-user.ts          # Hook para perfil/rol del usuario (cached, clearUserCache)
 scripts/
   migrate.ts             # Script legacy de migracion Dropbox -> Supabase (Claude API, batch)
+  scrape-lacuerda.mjs    # Scraping 51 artistas de LaCuerda.net → lacuerda_cristiano.json
+  upload-lacuerda.mjs    # Upload canciones de La Cuerda a Supabase con categorias
+  scrape-freidzon.mjs    # Scraping canciones de Claudio Freidzon
+  process-worshipleader.mjs  # Importa canciones desde SQLite de WorshipLeader
+  assign-artists-web.mjs # 278 mapeos titulo->artista hardcodeados
+  categorize*.mjs        # Scripts de categorizacion (dropbox, remaining, general)
+  cleanup-*.mjs          # Limpieza de duplicados y datos
+  fix-*.mjs              # Fixes: chord positions, solfege, short songs, worshipleader
+  export-songs.py        # Exporta canciones a Excel
 ```
 
 ## Variables de Entorno
@@ -175,6 +191,17 @@ CRON_SECRET                    # Secret para cron jobs
 ```
 
 **IMPORTANTE**: En Vercel, asegurar que las variables no tengan `\n` al final (causa errores como `Invalid client_id`).
+
+### Proyecto Supabase
+- **Nombre**: jec-hub
+- **Ref**: `avowxrzsqgetktqrefxa`
+- **Region**: Oceania (Sydney) — `ap-southeast-2`
+- **Plan**: Free
+- **URL**: `https://avowxrzsqgetktqrefxa.supabase.co`
+- **Org ID**: `pvghwrrsdnhddftddhdh`
+- **Nota**: Proyecto anterior (`dlpopmazvupiukpxurmf`) fue eliminado. Recreado el 2026-03-26.
+- **Auth Site URL**: `https://hub.jesuseselcamino.com.au` (configurado via Management API)
+- **Auth Redirect URIs**: `hub.jesuseselcamino.com.au/**`, `jec-hub.vercel.app/**`, `localhost:3000/**`
 
 ## Base de Datos (Supabase)
 
@@ -348,6 +375,8 @@ Permisos:
 - Busqueda por titulo/artista con debounce 300ms
 - Filtro por tonalidad (badges)
 - **Filtros avanzados**: artista, origen (manual/imagen/PDF/Dropbox), ordenar por (titulo/artista/fecha/key)
+- **Navegar por artista**: `/canciones/artistas` lista artistas con conteo, click navega a canciones del artista
+- **Navegar por categoria**: `/canciones/categorias` grid con iconos/gradientes, click navega a canciones de la categoria
 - Toggle borradores (admin)
 - **Seleccion masiva**: modo seleccion con checkboxes, publicar/borrador en lote
 - **Badge duplicados**: link a pagina de duplicados cuando existen (admin)
@@ -385,9 +414,13 @@ Permisos:
 
 ### Editor Visual de Acordes (Modo Acordes)
 - Acordes como badges posicionados sobre letras (fuente monospace)
+- **Drag & drop**: arrastrar acordes con mouse o touch (mobile)
 - Click para seleccionar, flechas para mover caracter por caracter
-- Agregar/eliminar acordes, editar letra inline
+- Agregar/eliminar acordes, renombrar acordes, editar letra inline
+- Activacion por linea: solo una linea activa a la vez (limpia estado al cambiar)
+- Collision detection: previene dos acordes en la misma posicion
 - Utilidades en `src/lib/chordpro/chord-position.ts`
+- **Font size dual**: controles separados para tamanio de letra y tamanio de acordes (10-36px)
 
 ### Importacion Individual de Archivos
 - Zona drag-and-drop en `/importar`
@@ -438,6 +471,7 @@ Permisos:
 | `/iglesia/ministerios/jovenes` | Zoe Zone Jovenes: verso, 3 features, lider Raquel, CTA |
 | `/iglesia/ministerios/ninos` | Escuela Dominical: verso, 3 features, lider Clara, CTA |
 | `/iglesia/ministerios/adoracion` | Equipo Adoracion: verso, 3 features, lider Ronal, CTA |
+| `/iglesia/en-vivo` | Live stream YouTube embed + horarios de servicio + CTA suscribirse |
 | `/iglesia/eventos` | Calendario publico + lista de eventos |
 | `/iglesia/contacto` | 3 info cards overlapping hero + formulario dark section |
 | `/iglesia/sermones` | Featured sermon overlapping + grid 3x2 con play overlays + series badges |
@@ -456,6 +490,7 @@ Permisos:
 - **Homepage**: hero full-screen, servicios (Domingo 3-5PM + Miercoles 7:30-9PM), ministerios preview, CTA
 - **Nosotros**: 3 pilares (Equipar/Enviar/Alcanzar), mision con parallax, pastores con stats
 - **Ministerios**: 5 cards (Hombres, Mujeres, Jovenes "Zoe Zone", Escuela Dominical, Adoracion) con fotos overlay + paginas individuales por ministerio (intro, 3 features, lider, CTA)
+- **En Vivo**: YouTube live embed (Channel ID `UChDID8HMZhz_VbzcU9U78lg`), horarios de servicio (Domingo/Miercoles), CTA suscribirse al canal, fallback cuando no hay live
 - **Eventos**: calendario mensual con badges coloreados, lista de eventos, Google Calendar links
 - **Contacto**: 3 cards equal-height overlapping hero (telefono, email, direccion), formulario dark section con mailto
 - **Sermones**: featured sermon overlapping hero (2-col: imagen con play button + contenido), grid 3x2 con hover play overlay, series badge, metadata (speaker/date/duration)
@@ -525,6 +560,7 @@ Permisos:
   - `/testimonios` → `/iglesia/testimonios`
   - `/donar` → `/iglesia/donar`
   - `/sermones` → `/iglesia/sermones`
+  - `/en-vivo` → `/iglesia/en-vivo`
 - Rutas `/iglesia` siempre publicas (sin auth, sin importar dominio)
 - Rutas publicas (sin auth): `/`, `/login`, `/registro`, `/api/*`
 - Unauthenticated → redirige a `/login`
@@ -533,12 +569,11 @@ Permisos:
 
 ## Migracion Dropbox
 
-### Estado Actual (Segunda Corrida via Web UI)
-- **Descarga completada**: 3,305 archivos descargados a Supabase Storage
-- **Errores de descarga**: 250 (archivos >15MB, timeouts, etc.)
-- **Procesamiento con Claude AI**: en curso (~13,800 archivos pendientes)
-- **Canciones en DB**: ~2,157 (todas como borrador)
-- **Metodo**: Web UI en `/importar` con OAuth de Dropbox (token permanente)
+### Estado Actual (Marzo 2026 — Proyecto Recreado)
+- **Proyecto Supabase anterior eliminado** — datos de migracion perdidos
+- **Canciones recuperadas**: 8,743 (6,054 La Cuerda + 2,689 WorshipLeader) desde archivos locales
+- **Canciones de Dropbox**: pendiente re-migrar (archivos siguen en Dropbox del usuario)
+- **Metodo**: Web UI en `/importar` con OAuth de Dropbox (necesita reconectar)
 
 ### Primera Corrida (Legacy, via script)
 - Script: `scripts/migrate.ts` (usa Claude API directo)
@@ -584,6 +619,14 @@ JEC Hub evolucionara a **JEC Platform** — plataforma centralizada de la iglesi
 - [x] Nav completo: 7 links + boton Give/Donar con Heart icon
 - [x] Paginas individuales por ministerio (hombres, mujeres, jovenes, ninos, adoracion) con intro, features, lider, CTA
 - [x] Reemplazo de imagenes repetidas en homepage, contacto y eventos con stock photos unicos
+- [x] Pagina En Vivo (`/iglesia/en-vivo`) con YouTube live embed (Channel ID) + horarios + CTA subscribe
+- [x] Navegacion por artista y categoria en biblioteca de canciones
+- [x] APIs de artistas y categorias (`/api/songs/artists`, `/api/songs/categories`)
+- [x] Editor de acordes drag-and-drop con soporte touch/mobile
+- [x] Font size dual (letras + acordes independientes)
+- [x] Parser ChordPro mejorado: auto-merge lineas de acordes + letras separadas
+- [x] Recreacion proyecto Supabase (`avowxrzsqgetktqrefxa`) con 8,743 canciones recuperadas
+- [x] 14 scripts de scraping/categorization/cleanup en `scripts/`
 
 ### Fase 2: Pendiente — Mejoras iglesia
 - [ ] **AUDITORIA DE IMAGENES REPETIDAS**: Revisar TODAS las paginas y verificar que ninguna imagen se repita entre paginas o secciones. Actualmente `worship.jpg` aun se usa en nosotros (mision) y ministerios ("One Body"). Usar fotos unicas de Pexels para cada seccion. Comando para auditar: `grep -rn "iglesia/" src/app/iglesia/ | grep -E "\.(jpg|png|jpeg)" | sort`
@@ -596,53 +639,113 @@ JEC Hub evolucionara a **JEC Platform** — plataforma centralizada de la iglesi
 - [ ] Fotos reales de la iglesia (reemplazar stock photos de Pexels por fotos propias)
 - [ ] SEO: meta tags por pagina, OpenGraph images, sitemap.xml
 - [ ] Performance: Next.js Image component (actualmente usa `<img>` tags)
+- [ ] Re-migrar canciones de Dropbox (archivos siguen en Dropbox, necesita reconectar OAuth)
 
-### Fase 3: CMS Backend (Gestion de Contenido desde el Hub)
-**Vision**: Cada pagina publica de la iglesia se puede editar desde el backend (hub), como un web builder.
-Los encargados de cada ministerio pueden gestionar su propia seccion.
+### Fase 3: CMS Block Editor + Paneles Ministeriales (PLAN APROBADO)
 
-- [ ] **Tabla `church_content`** en Supabase: almacena textos, imagenes, videos editables por seccion/pagina
-  - Campos: `page` (string), `section` (string), `key` (string), `value_text`, `value_image_url`, `value_json`, `updated_by`, `updated_at`
-  - Cada pagina del frontend lee de esta tabla en vez de tener contenido hardcodeado
-- [ ] **CRUD de contenido** (`/api/content`): GET publico, PATCH por rol
-- [ ] **Editor inline en hub** (`/(app)/contenido`): formularios por pagina/seccion, preview en vivo
-- [ ] **Gestion de sermones**: tabla `sermons` (title, youtube_id, spotify_id, series, speaker, date, notes_content, status)
-  - Admin agrega YouTube link + notas → se refleja automaticamente en el frontend
-  - Reemplaza datos hardcodeados en sermones/page.tsx
-- [ ] **Gestion de podcasts**: tabla `podcasts` (title, spotify_id, series, duration, date)
-- [ ] **Gestion de testimonios**: tabla `testimonies` (name, category, quote, image_url, full_story, status)
-- [ ] **Gestion de donar**: datos bancarios editables desde el hub (BSB, cuenta, nombre)
-- [ ] **Gestion de imagenes**: upload de fotos desde el hub → Supabase Storage → se refleja en el frontend
+**Vision**: Cada pagina publica de la iglesia se puede editar desde el backend (hub), como un web builder con bloques arrastrables. Cada ministerio gestiona su propia seccion. Pastor Morris aprueba todo.
 
-### Fase 4: Paneles Ministeriales + Roles Granulares
-**Vision**: Cada ministerio tiene su propio panel en el hub. Pastor Morris es admin global.
+**Estado**: Plan aprobado, implementacion pendiente (commit backup: `21a7f14`).
+**Plan completo**: `.claude/plans/prancy-herding-hoare.md`
 
-**Roles y permisos**:
-- `pastor` (Morris Velasquez): admin global, aprueba todo, ve todo
-- `admin` (christian.mastro@gmail.com): power user, mismo acceso que pastor
-- `lider_ministerio`: puede editar SU ministerio (contenido, calendario, fotos)
-- `member`: solo ve contenido publicado
+#### Base de datos (6 tablas nuevas + 2 modificaciones)
 
-**Paneles**:
-- [ ] **Panel Pastoral** (`/(app)/pastoral`): vista global de todos los ministerios, aprobaciones pendientes, calendario unificado
-- [ ] **Panel Ministerio Hombres** (`/(app)/ministerio/hombres`): Morris como lider
-- [ ] **Panel Ministerio Mujeres** (`/(app)/ministerio/mujeres`): Daisy como lider
-- [ ] **Panel Ministerio Jovenes** (`/(app)/ministerio/jovenes`): Raquel como lider (Zoe Zone)
-- [ ] **Panel Escuela Dominical** (`/(app)/ministerio/ninos`): Clara como lider
-- [ ] **Panel Adoracion** (`/(app)/ministerio/adoracion`): Ronal como lider (ya existe como musica)
+**Nuevas tablas:**
+1. `ministries` — registro de los 5 ministerios (slug, nombre EN/ES, lider, imagen)
+2. `ministry_members` — vincula usuarios a ministerios con rol (lider/colaborador/miembro)
+3. `page_blocks` — bloques de contenido editables por pagina (tipo, posicion, content_en jsonb, content_es jsonb)
+4. `page_media` — imagenes subidas para el CMS (path en Storage, alt text)
+5. `sermons` — sermones con youtube_id, spotify_id, series, blog_content, status
+6. `podcasts` — episodios de Spotify con metadata
 
-**Calendario por ministerio**:
-- [ ] Tabla `ministry_events` con campo `ministry` + `approved_by`
-- [ ] Cada ministerio crea sus eventos → pastor aprueba → se publican
-- [ ] Vista unificada en panel pastoral
-- [ ] Vista filtrada en panel de cada ministerio
+**Modificaciones:**
+- `profiles.role`: expandir de `'admin'|'member'` a `'pastor'|'admin'|'lider_ministerio'|'member'`
+- `church_events`: agregar columna `ministry_id` (FK a ministries)
 
-### Fase 5: Seguridad avanzada
+#### Tipos de bloque soportados
+- `hero` — banner con imagen + titulo + label
+- `text` — titulo + cuerpo de texto
+- `image` — imagen con caption
+- `gallery` — grid de multiples imagenes
+- `verse` — cita biblica destacada
+- `cta` — boton call-to-action con link
+- `video` — YouTube o Spotify embed
+- `features` — grid de 3 features con icono + titulo + descripcion
+- `leader` — perfil del lider con foto + bio
+
+Cada bloque guarda `content_en` y `content_es` como JSONB (maxima flexibilidad por tipo).
+
+#### Roles y permisos (4 niveles)
+
+| Rol | Quien | Acceso |
+|-----|-------|--------|
+| `pastor` | Morris Velasquez | Admin global, aprueba todo |
+| `admin` | christian.mastro@gmail.com | Power user, mismo acceso que pastor |
+| `lider_ministerio` | Daisy, Raquel, Clara, Ronal | Edita SU ministerio (bloques, eventos draft, fotos) |
+| `member` | Usuarios normales | Solo ve contenido publicado |
+
+**Backward compatible**: `isAdmin` sigue retornando `true` para `pastor` y `admin`.
+
+#### Sub-fases de implementacion
+
+**Fase 3a: Foundation (DB + Roles + Auth)**
+- [ ] SQL migration: CREATE 6 tablas + ALTER profiles + ALTER church_events
+- [ ] `src/lib/auth/permissions.ts` — helpers: requireAuth(), requireRole(), requireMinistryAccess()
+- [ ] Actualizar `src/lib/types/database.ts` — interfaces Ministry, PageBlock, PageMedia, Sermon, Podcast, MinistryMember
+- [ ] Actualizar `src/hooks/use-user.ts` — exponer role completo, ministry assignments, isPastor, isLeader, canManage(slug)
+- [ ] Actualizar `src/app/api/me/route.ts` — join con ministry_members, retornar assignments
+- [ ] Actualizar sidebar con nav links condicionales por rol
+
+**Fase 3b: Block Editor + Ministry Pages**
+- [ ] API routes: `/api/cms/blocks`, `/api/cms/blocks/[id]`, `/api/cms/blocks/reorder`, `/api/cms/media`, `/api/ministries`
+- [ ] Componentes CMS: block-editor.tsx (con @dnd-kit), sortable-block.tsx, block-form.tsx, 9 block renderers
+- [ ] Media picker modal (upload/seleccion de imagenes)
+- [ ] Hub pages: `/(app)/ministerios`, `/(app)/ministerios/[slug]`, `/(app)/ministerios/[slug]/contenido`
+- [ ] Rendering publico dinamico: `dynamic-page.tsx` + `dynamic-block.tsx`
+- [ ] Fallback: pagina sin bloques en DB → muestra contenido hardcodeado actual
+
+**Fase 3c: Sermons + Podcasts**
+- [ ] Tablas `sermons` + `podcasts` con seed de datos actuales
+- [ ] API routes: `/api/sermons`, `/api/sermons/[slug]`, `/api/podcasts`
+- [ ] Hub: CRUD de sermones (agregar YouTube link + notas blog)
+- [ ] Hub: CRUD de podcasts
+- [ ] Publico: `/iglesia/sermones` → fetch de API en vez de array hardcodeado
+- [ ] Publico: `/iglesia/sermones/[slug]` → reemplaza 3 paginas estaticas con una dinamica
+
+**Fase 3d: Ministry Events + Calendar**
+- [ ] Filtro `?ministry=slug` en GET /api/events
+- [ ] Lider_ministerio puede crear eventos draft para su ministerio
+- [ ] Solo pastor/admin aprueba → published
+- [ ] Hub: `/(app)/ministerios/[slug]/eventos`
+
+**Fase 3e: CMS Global (paginas no-ministerio)**
+- [ ] Hub: `/(app)/contenido` — lista de todas las paginas editables
+- [ ] Hub: `/(app)/contenido/[pageSlug]` — block editor generico
+- [ ] Migrar nosotros, donar, contacto, testimonios a bloques dinamicos
+
+#### Patrones existentes a reusar
+
+| Patron | Archivo referencia | Para que |
+|--------|-------------------|----------|
+| CRUD API + auth | `src/app/api/events/route.ts` | Todos los nuevos endpoints |
+| Drag-and-drop | `src/app/(app)/programas/[id]/page.tsx` | Reordenar bloques |
+| Admin UI (forms, cards) | `src/app/(app)/eventos/page.tsx` | Formularios inline, badges |
+| Supabase admin client | `src/lib/supabase/admin.ts` | Bypass RLS en todas las APIs |
+| useUser() hook | `src/hooks/use-user.ts` | Auth state + role checks |
+| FadeIn + diseno iglesia | `src/components/iglesia/fade-in.tsx` | Renderizado publico de bloques |
+
+### Fase 4: Seguridad avanzada
 - [ ] Verificacion de email (Supabase lo soporta nativamente)
 - [ ] Verificacion de mobile (SMS via Supabase + Twilio)
 
-### Fase 6: Mejoras futuras
+### Fase 5: Mejoras futuras
 - [ ] Dashboard post-login con acceso a ministerios
 - [ ] Mover rutas de musica bajo `/musica/*`
 - [ ] Soporte Espanol/Ingles en plataforma hub (~24 archivos)
 - [ ] Preferencia de idioma en perfil de usuario
+- [ ] Testimonios: conectar a datos reales + paginas individuales
+- [ ] Donar: integrar plataforma de pagos online (Stripe/PayPal)
+- [ ] Contacto: backend real para formulario (actualmente usa mailto)
+- [ ] Fotos reales de la iglesia (reemplazar stock photos)
+- [ ] SEO: meta tags por pagina, OpenGraph images, sitemap.xml
+- [ ] Performance: Next.js Image component (actualmente usa `<img>` tags)
