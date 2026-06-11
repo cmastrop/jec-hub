@@ -36,6 +36,9 @@ yarn-error.log*
 # test scripts with tokens
 scripts/test-*
 
+# local Claude Code settings (may contain tokens in permission entries)
+.claude/settings.local.json
+
 # original church photos (selected ones are in public/iglesia/)
 /iglesia_fotos
 
