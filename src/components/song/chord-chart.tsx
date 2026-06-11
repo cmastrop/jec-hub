@@ -14,6 +14,7 @@ interface ChordChartProps {
   transpose?: number;
   targetKey?: string;
   fontSize?: number;
+  chordFontSize?: number;
 }
 
 export function ChordChart({
@@ -22,10 +23,11 @@ export function ChordChart({
   transpose = 0,
   targetKey,
   fontSize = 18,
+  chordFontSize: chordFontSizeProp,
 }: ChordChartProps) {
   const song = useMemo(() => parseChordPro(content), [content]);
 
-  const chordFontSize = fontSize - 2;
+  const chordFontSize = chordFontSizeProp ?? fontSize - 2;
 
   // Compute the displayed key
   const displayKey = useMemo(() => {

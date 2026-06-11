@@ -20,7 +20,7 @@ import {
   Image as ImageIcon,
   X,
 } from "lucide-react";
-import Link from "next/link";
+
 
 export default function SongDetailPage() {
   const params = useParams();
@@ -32,6 +32,7 @@ export default function SongDetailPage() {
   const [semitones, setSemitones] = useState(0);
   const [targetKey, setTargetKey] = useState("");
   const [fontSize, setFontSize] = useState(18);
+  const [chordFontSize, setChordFontSize] = useState(16);
   const [notation, setNotation] = useState<NotationMode>("letter");
   const [deleting, setDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -171,12 +172,12 @@ export default function SongDetailPage() {
         <h2 className="text-xl font-semibold text-gray-700 mb-2">
           {error || "Cancion no encontrada"}
         </h2>
-        <Link
-          href="/canciones"
+        <button
+          onClick={() => router.back()}
           className="text-primary hover:underline text-sm"
         >
           Volver a canciones
-        </Link>
+        </button>
       </div>
     );
   }
@@ -187,13 +188,13 @@ export default function SongDetailPage() {
       <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between mb-3">
-            <Link
-              href="/canciones"
+            <button
+              onClick={() => router.back()}
               className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-foreground transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Volver
-            </Link>
+            </button>
             <div className="flex items-center gap-2">
               {song.status === "draft" && (
                 <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">
@@ -269,7 +270,12 @@ export default function SongDetailPage() {
                 notation={notation}
               />
               <div className="hidden sm:block w-px h-8 bg-gray-200" />
-              <FontSizeControls fontSize={fontSize} onChange={setFontSize} />
+              <FontSizeControls
+                fontSize={fontSize}
+                chordFontSize={chordFontSize}
+                onFontSizeChange={setFontSize}
+                onChordFontSizeChange={setChordFontSize}
+              />
               <div className="hidden sm:block w-px h-8 bg-gray-200" />
               <NotationToggle notation={notation} onChange={setNotation} />
             </div>
@@ -333,6 +339,7 @@ export default function SongDetailPage() {
                 transpose={semitones}
                 targetKey={targetKey}
                 fontSize={fontSize}
+                chordFontSize={chordFontSize}
               />
             )}
           </div>

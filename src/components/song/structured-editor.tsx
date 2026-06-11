@@ -122,6 +122,7 @@ export function StructuredEditor({
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [editingLabel, setEditingLabel] = useState<number | null>(null);
   const [chordEditMode, setChordEditMode] = useState<"text" | "visual">("text");
+  const [activeLineKey, setActiveLineKey] = useState<string | null>(null);
 
   const song = useMemo(() => parseChordPro(content), [content]);
 
@@ -431,13 +432,18 @@ export function StructuredEditor({
               {/* Section content */}
               {chordEditMode === "visual" ? (
                 <div className="p-2 space-y-0.5 bg-white/50">
-                  {section.lines.map((lineItem, lineIdx) => (
-                    <ChordPositionEditor
-                      key={lineIdx}
-                      line={lineItem}
-                      onChange={(newLine) => updateSectionLine(idx, lineIdx, newLine)}
-                    />
-                  ))}
+                  {section.lines.map((lineItem, lineIdx) => {
+                    const lineKey = `${idx}-${lineIdx}`;
+                    return (
+                      <ChordPositionEditor
+                        key={lineIdx}
+                        line={lineItem}
+                        onChange={(newLine) => updateSectionLine(idx, lineIdx, newLine)}
+                        isActive={activeLineKey === lineKey}
+                        onActivate={() => setActiveLineKey(lineKey)}
+                      />
+                    );
+                  })}
                 </div>
               ) : (
                 <textarea

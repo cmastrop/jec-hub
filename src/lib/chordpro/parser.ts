@@ -44,6 +44,83 @@ function inferSectionType(label: string): SectionType {
   return "unknown";
 }
 
+/** Check if a line has chords but only whitespace/empty text */
+function isChordOnlyLine(line: Line): boolean {
+  if (!line.segments.some(s => s.chord)) return false;
+  return line.segments.every(s => !s.text || s.text.trim() === "");
+}
+
+/** Check if a line has no chords at all */
+function isTextOnlyLine(line: Line): boolean {
+  return line.segments.every(s => !s.chord) && line.segments.some(s => s.text.trim() !== "");
+}
+
+/** Merge a chord-only line with the text-only line below it */
+function mergeChordAndTextLines(chordLine: Line, textLine: Line): Line {
+  // Compute character position of each chord in the chord-only line
+  const chordPositions: { chord: string; position: number }[] = [];
+  let pos = 0;
+  for (const seg of chordLine.segments) {
+    if (seg.chord) {
+      chordPositions.push({ chord: seg.chord, position: pos });
+    }
+    pos += (seg.text || "").length;
+  }
+
+  // Get the full lyrics text
+  const fullText = textLine.segments.map(s => s.text).join("");
+
+  chordPositions.sort((a, b) => a.position - b.position);
+
+  const segments: Segment[] = [];
+  let lastPos = 0;
+
+  for (const cp of chordPositions) {
+    const clampedPos = Math.min(cp.position, fullText.length);
+    if (clampedPos > lastPos) {
+      const textBefore = fullText.slice(lastPos, clampedPos);
+      if (segments.length > 0) {
+        segments[segments.length - 1].text += textBefore;
+      } else {
+        segments.push({ text: textBefore });
+      }
+    }
+    segments.push({ chord: cp.chord, text: "" });
+    lastPos = clampedPos;
+  }
+
+  const remaining = fullText.slice(lastPos);
+  if (remaining) {
+    if (segments.length > 0) {
+      segments[segments.length - 1].text += remaining;
+    } else {
+      segments.push({ text: remaining });
+    }
+  }
+
+  if (segments.length === 0) {
+    segments.push({ text: "" });
+  }
+
+  return { segments };
+}
+
+/** Post-process section lines: merge chord-only + text-only consecutive pairs */
+function postProcessLines(lines: Line[]): Line[] {
+  const result: Line[] = [];
+  let i = 0;
+  while (i < lines.length) {
+    if (i + 1 < lines.length && isChordOnlyLine(lines[i]) && isTextOnlyLine(lines[i + 1])) {
+      result.push(mergeChordAndTextLines(lines[i], lines[i + 1]));
+      i += 2; // skip both lines
+    } else {
+      result.push(lines[i]);
+      i++;
+    }
+  }
+  return result;
+}
+
 function parseLine(text: string): Line {
   const segments: Segment[] = [];
   let lastIndex = 0;
@@ -189,6 +266,11 @@ export function parseChordPro(input: string): ChordProSong {
   // Push last section
   if (currentSection) {
     sections.push(currentSection);
+  }
+
+  // Post-process: merge chord-only + text-only line pairs
+  for (const section of sections) {
+    section.lines = postProcessLines(section.lines);
   }
 
   return { metadata, sections };
