@@ -1,8 +1,11 @@
 -- Zoe Zone — fechas del grupo de jóvenes
 --
 -- Reuniones quincenales 2026: 5 viernes cada 14 días (31/07, 14/08, 28/08, 11/09, 25/09).
--- Encuentro 2027: viernes 05/02 a domingo 07/02 (evento multi-día vía end_date).
 -- Horario tomado de `youthSchedule` en src/lib/iglesia/translations.ts (viernes 7:00 PM).
+--
+-- NOTA: el campamento del 05-07/02/2027 se cargó acá por error y fue borrado — no es
+-- del ministerio de jóvenes sino de toda la iglesia. Si se vuelve a cargar, va como
+-- evento aparte sin ministry_id y con otro event_type.
 --
 -- Idempotente: reejecutar no duplica (guarda por title + event_date).
 -- Correr vía Management API:
@@ -32,27 +35,4 @@ FROM (VALUES
 WHERE NOT EXISTS (
   SELECT 1 FROM church_events e
   WHERE e.title = v.title AND e.event_date = v.event_date::date
-);
-
--- Encuentro de 3 días: viernes 05/02/2027 a domingo 07/02/2027.
--- TODO: confirmar nombre real del encuentro y hora de inicio con el liderazgo.
-INSERT INTO church_events (
-  title, description, event_date, end_date, start_time, location,
-  event_type, status, recurring, ministry_id
-)
-SELECT
-  'Zoe Zone — Encuentro de Jóvenes',
-  'Encuentro de tres días del ministerio de jóvenes Zoe Zone.',
-  '2027-02-05'::date,
-  '2027-02-07'::date,
-  '19:00',
-  '73 Nollamara Ave, Nollamara WA 6061',
-  'youth',
-  'published',
-  false,
-  (SELECT id FROM ministries WHERE slug = 'jovenes')
-WHERE NOT EXISTS (
-  SELECT 1 FROM church_events e
-  WHERE e.title = 'Zoe Zone — Encuentro de Jóvenes'
-    AND e.event_date = '2027-02-05'::date
 );
