@@ -54,14 +54,14 @@ export const translations = {
       "Bringing brothers in Christ together through fellowship, accountability, and discipleship.",
     mensDescLong: "Our men's ministry brings brothers in Christ together through fellowship, accountability, and discipleship. We gather regularly to study the Word, encourage one another, and build lasting friendships rooted in faith.",
     mensCategory: "Adult Ministry",
-    mensSchedule: "Saturdays, 9:00 AM",
+    mensSchedule: "Saturdays, 10:00 AM",
     mensLeader: "Pastor Morris Velasquez",
     womensTitle: "Women's Group",
     womensDesc:
       "Bringing women in Christ together to grow in faith, support, and sisterhood.",
     womensDescLong: "Our women's ministry creates a safe and uplifting space for women to grow in faith, find support, and build sisterhood. Through Bible studies, prayer meetings, and fellowship events, we empower each other in Christ.",
     womensCategory: "Adult Ministry",
-    womensSchedule: "Saturdays, 9:00 AM",
+    womensSchedule: "Saturdays, 10:00 AM",
     womensLeader: "Pastora Daisy Velasquez",
     youthTitle: "Youth Group",
     youthDesc:
@@ -439,14 +439,14 @@ export const translations = {
       "Uniendo a hermanos en Cristo a través de la comunión, la responsabilidad mutua y el discipulado.",
     mensDescLong: "Nuestro ministerio de hombres une a hermanos en Cristo a través de la comunión, la responsabilidad mutua y el discipulado. Nos reunimos regularmente para estudiar la Palabra, animarnos mutuamente y construir amistades duraderas arraigadas en la fe.",
     mensCategory: "Ministerio de Adultos",
-    mensSchedule: "Sábados, 9:00 AM",
+    mensSchedule: "Sábados, 10:00 AM",
     mensLeader: "Pastor Morris Velasquez",
     womensTitle: "Grupo de Mujeres",
     womensDesc:
       "Uniendo a mujeres en Cristo para crecer en fe, apoyo y hermandad.",
     womensDescLong: "Nuestro ministerio de mujeres crea un espacio seguro y edificante para que las mujeres crezcan en la fe, encuentren apoyo y construyan hermandad. A través de estudios bíblicos, reuniones de oración y eventos de comunión, nos empoderamos mutuamente en Cristo.",
     womensCategory: "Ministerio de Adultos",
-    womensSchedule: "Sábados, 9:00 AM",
+    womensSchedule: "Sábados, 10:00 AM",
     womensLeader: "Pastora Daisy Velasquez",
     youthTitle: "Grupo de Jóvenes",
     youthDesc:
