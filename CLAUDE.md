@@ -193,6 +193,7 @@ scripts/
   cleanup-*.mjs          # Limpieza de duplicados y datos
   fix-*.mjs              # Fixes: chord positions, solfege, short songs, worshipleader
   export-songs.py        # Exporta canciones a Excel
+  seed-zoe-zone-events.sql # Fechas Zoe Zone 2026 (5 viernes quincenales) — idempotente, correr via Management API
 ```
 
 ## Variables de Entorno
@@ -216,10 +217,11 @@ SUPABASE_ACCESS_TOKEN          # Token Management API (solo local, para ejecutar
 - **Nombre**: jec-hub
 - **Ref**: `avowxrzsqgetktqrefxa`
 - **Region**: Oceania (Sydney) — `ap-southeast-2`
-- **Plan**: Free
+- **Plan**: Free — **se pausa tras ~7 dias sin actividad de DB**, ver "Mantenimiento de la Base de Datos"
 - **URL**: `https://avowxrzsqgetktqrefxa.supabase.co`
 - **Org ID**: `pvghwrrsdnhddftddhdh`
 - **Nota**: Proyecto anterior (`dlpopmazvupiukpxurmf`) fue eliminado. Recreado el 2026-03-26.
+- **Otros proyectos en la cuenta** (no confundir al restaurar): `heavensglow-v2` (`hkukiapttwkqrhylogig`), `kleanzyhub` (`unsstzacudyeildnixrr`)
 - **Auth Site URL**: `https://hub.jesuseselcamino.com.au` (configurado via Management API)
 - **Auth Redirect URIs**: `hub.jesuseselcamino.com.au/**`, `jec-hub.vercel.app/**`, `localhost:3000/**`
 
@@ -560,13 +562,48 @@ Permisos:
 - Diseno split-screen con imagen de adoracion
 - Responsive (stacked en mobile, side-by-side en desktop)
 
-## Estado de la Sesion (2026-06-11) — Para Retomar
+## Estado de la Sesion (2026-07-29) — Para Retomar
 
-- **10 commits locales SIN PUSHEAR** (`cb3a516..` hasta el ultimo): la red corporativa bloquea github.com y api.vercel.com (timeout TCP 443). Desde otra red: `git push origin master` + `npx vercel --prod`
-- **Produccion DB ya actualizada**: migracion CMS aplicada via Management API (`api.supabase.com` SI funciona desde la red corporativa; token en `.env.local` como `SUPABASE_ACCESS_TOKEN`)
-- **OJO**: el CLI de Supabase local quedo linkeado a heavensglow-v2 (`supabase/.temp/project-ref` = `hkukiapttwkqrhylogig`), NO usar `supabase db push` sin re-linkear a `avowxrzsqgetktqrefxa`
-- **Truco PowerShell 5.1 + Management API**: leer SQL con `[System.IO.File]::ReadAllText(path, UTF8)`, castear `[string]$sql.ToString()` antes de ConvertTo-Json, y enviar bytes UTF-8 con `-ContentType "application/json; charset=utf-8"`
-- **Proximos pasos**: 1) push + deploy, 2) asignar roles reales (pastor/lideres), 3) Fase 3c (sermones/podcasts), 4) reemplazar 7 imagenes repetidas (auditoria hecha: worship.jpg x3, preaching.jpg x5, 5 fotos ministerio duplicadas homepage-preview vs hero; huerfanas reutilizables: speaker.jpg, worship-hands.jpg, sermon-1/2/4/5/6.jpg)
+- **Todo pusheado y deployado**: master en `17ad3dc`, sincronizado con GitHub y en produccion. La red corporativa que bloqueaba github.com y api.vercel.com el 2026-06-11 **ya no bloquea nada**
+- **DB restaurada y activa**: el proyecto estuvo pausado 48 dias por inactividad (ver "Mantenimiento de la Base de Datos"). Restaurado el 2026-07-29, 20 MB, 8.743 canciones intactas
+- **OJO**: el CLI de Supabase local sigue linkeado a heavensglow-v2 (`supabase/.temp/project-ref` = `hkukiapttwkqrhylogig`), NO usar `supabase db push` sin re-linkear a `avowxrzsqgetktqrefxa`
+- **Truco PowerShell 5.1 + Management API**: leer SQL con `[System.IO.File]::ReadAllText(path, UTF8)`, castear `[string]$sql.ToString()` antes de ConvertTo-Json, y enviar bytes UTF-8 con `-ContentType "application/json; charset=utf-8"`. Los acentos se ven mal en la consola de PowerShell aunque esten bien guardados — verificar con `length()`/`octet_length()`, no a ojo
+- **Branch `backup-pre-rewrite` (`a0ad386`)**: historial viejo con un PAT de Supabase y un service_role JWT del proyecto eliminado. **NO pushearlo**; borrar con `git branch -D backup-pre-rewrite` cuando ya no haga falta. El historial de master fue limpiado con `git filter-branch` porque GitHub push protection rechazaba el push
+- **Proximos pasos**: 1) asignar roles reales (hoy solo existe 1 perfil `admin`, `ministry_members` esta vacio), 2) evitar que la DB se vuelva a pausar, 3) Fase 3c (sermones/podcasts), 4) reemplazar 7 imagenes repetidas (auditoria hecha: worship.jpg x3, preaching.jpg x5, 5 fotos ministerio duplicadas homepage-preview vs hero; huerfanas reutilizables: speaker.jpg, worship-hands.jpg, sermon-1/2/4/5/6.jpg)
+
+## Mantenimiento de la Base de Datos
+
+### Por que se pausa
+El plan **Free de Supabase pausa el proyecto tras ~7 dias sin actividad de base de datos**. Ya paso una vez: el proyecto quedo `INACTIVE` entre el 2026-06-11 y el 2026-07-29. Sintomas:
+- La Management API devuelve **544** en cualquier query
+- El hub (login, canciones, programas, eventos, CMS) queda caido
+- **La pagina de iglesia sigue devolviendo 200** porque es casi toda estatica — por eso la caida pasa desapercibida
+
+Ojo: **el trafico web NO cuenta como actividad si no toca la DB**. `/api/health` solo lee variables de entorno, no consulta Postgres, asi que pinguearlo no evita la pausa.
+
+### Como restaurarlo (solo desde el dashboard, no hay API)
+1. Ir a `https://supabase.com/dashboard/project/avowxrzsqgetktqrefxa`
+2. Boton **"Restore project"** y confirmar el dialogo
+3. Esperar. Pasa por el estado `COMING_UP`; mientras tanto la Management API devuelve **400 Bad Request** (no 544). Si aparece un 400 raro, **reintentar antes de diagnosticar el SQL**
+4. Verificar con: `select count(*) from songs` → debe dar 8743
+
+No se pierden datos: la pausa no borra nada.
+
+### Opciones para que no se vuelva a pausar
+| Opcion | Costo | Fiabilidad |
+|--------|-------|-----------|
+| Upgrade a Supabase **Pro** | USD 25/mes | Total — los proyectos Pro nunca se pausan |
+| **Vercel Cron** diario a un endpoint que consulte la DB | Gratis | Buena, pero hay que crear el endpoint (ver abajo) |
+| Entrar al hub una vez por semana | Gratis | Fragil — depende de acordarse |
+
+**El cron todavia NO existe.** Para implementarlo hace falta: crear `vercel.json` con un `crons` diario, agregar una ruta que haga un `select` real contra Postgres (protegida con `CRON_SECRET`, que ya esta en las env vars pero **sin usos en el codigo**), y deployar. En Hobby, Vercel permite hasta 2 cron jobs con frecuencia diaria — alcanza de sobra.
+
+### Chequeo rapido de estado
+```powershell
+$tok = (Get-Content .env.local | Where-Object { $_ -match '^SUPABASE_ACCESS_TOKEN=' }) -replace '^SUPABASE_ACCESS_TOKEN=','' -replace '"','';
+(Invoke-RestMethod -Uri "https://api.supabase.com/v1/projects/avowxrzsqgetktqrefxa" -Headers @{Authorization="Bearer $tok"}).status
+# ACTIVE_HEALTHY = ok | INACTIVE = pausado | COMING_UP = levantando
+```
 
 ## Deploy
 
@@ -677,6 +714,7 @@ JEC Hub evolucionara a **JEC Platform** — plataforma centralizada de la iglesi
 - [x] 14 scripts de scraping/categorization/cleanup en `scripts/`
 
 ### Fase 2: Pendiente — Mejoras iglesia
+- [ ] **EVITAR QUE LA DB SE PAUSE**: el plan Free pausa el proyecto tras ~7 dias sin actividad de DB y ya tumbo el hub una vez (48 dias caido). Decidir entre upgrade a Pro (USD 25/mes) o Vercel Cron diario + endpoint que consulte Postgres. Ver "Mantenimiento de la Base de Datos"
 - [ ] **AUDITORIA DE IMAGENES REPETIDAS**: Revisar TODAS las paginas y verificar que ninguna imagen se repita entre paginas o secciones. Actualmente `worship.jpg` aun se usa en nosotros (mision) y ministerios ("One Body"). Usar fotos unicas de Pexels para cada seccion. Comando para auditar: `grep -rn "iglesia/" src/app/iglesia/ | grep -E "\.(jpg|png|jpeg)" | sort`
 - [x] Sermones: YouTube embeds reales + Spotify podcasts + paginas individuales con notas
 - [ ] Testimonios: conectar a datos reales (actualmente placeholders estaticos)
@@ -742,7 +780,7 @@ Cada bloque guarda `content_en` y `content_es` como JSONB (maxima flexibilidad p
 - [x] `src/hooks/use-user.ts` — expone role, ministries, isPastor, isLeader, canManage(slug); isAdmin = pastor|admin (backward compatible)
 - [x] `src/app/api/me/route.ts` — join con ministry_members, retorna assignments
 - [x] Sidebar con link "Ministerios" condicional por rol (pastor/admin/lider_ministerio)
-- [ ] PENDIENTE: asignar roles reales en produccion (Morris → pastor; lideres → lider_ministerio + fila en ministry_members)
+- [ ] PENDIENTE: asignar roles reales en produccion (Morris → pastor; lideres → lider_ministerio + fila en ministry_members). **Verificado 2026-07-29: sigue sin hacerse** — la tabla `profiles` tiene 1 solo perfil con rol `admin`, y `ministry_members` esta vacia (0 filas). Hasta que no se creen las cuentas de los lideres, el CMS por ministerio no lo puede usar nadie mas que el admin
 
 **Fase 3b: Block Editor + Ministry Pages (COMPLETADA 2026-06-11)**
 - [x] API routes: `/api/cms/blocks`, `/api/cms/blocks/[id]`, `/api/cms/blocks/reorder`, `/api/cms/media`, `/api/ministries`
