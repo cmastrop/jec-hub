@@ -49,6 +49,7 @@ const defaultForm = {
   start_time: "",
   end_time: "",
   location: "73 Nollamara Ave, Nollamara WA 6061",
+  registration_url: "",
   event_type: "service" as EventType,
   status: "draft" as EventStatus,
   recurring: false,
@@ -117,6 +118,7 @@ export default function EventosPage() {
     const body = {
       ...form,
       end_date: form.end_date || null,
+      registration_url: form.registration_url.trim() || null,
       recurring_day: form.recurring ? form.recurring_day : null,
     };
 
@@ -196,6 +198,7 @@ export default function EventosPage() {
       start_time: ev.start_time || "",
       end_time: ev.end_time || "",
       location: ev.location || "",
+      registration_url: ev.registration_url || "",
       event_type: ev.event_type,
       status: ev.status,
       recurring: ev.recurring,
@@ -375,6 +378,19 @@ export default function EventosPage() {
                 type="text"
                 value={form.location}
                 onChange={(e) => setForm({ ...form, location: e.target.value })}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Link de inscripcion (opcional)
+              </label>
+              <input
+                type="url"
+                value={form.registration_url}
+                onChange={(e) => setForm({ ...form, registration_url: e.target.value })}
+                placeholder="https://forms.gle/..."
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
               />
             </div>
@@ -653,6 +669,16 @@ function EventCard({
               <MapPin className="w-3.5 h-3.5" />
               {event.location}
             </p>
+          )}
+          {event.registration_url && (
+            <a
+              href={event.registration_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline break-all"
+            >
+              Inscripcion: {event.registration_url}
+            </a>
           )}
           {event.recurring && (
             <p className="text-gray-500">

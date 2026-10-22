@@ -262,6 +262,8 @@ Migracion: `supabase/migrations/20260611000000_cms_foundation.sql` (idempotente)
 - `id` (uuid), `title` (text), `description` (text)
 - `event_date` (date), `start_time` (text), `end_time` (text)
 - `location` (text, default "73 Nollamara Ave, Nollamara WA 6061")
+- `end_date` (date, null = un dia) — eventos multi-dia
+- `registration_url` (text, opcional) — link de inscripcion; la pagina publica muestra boton "Inscribirse" y un banner arriba del calendario para eventos de los proximos 12 meses que lo tengan
 - `event_type` (text: service/youth/prayer/special/community/conference)
 - `status` (text: draft/approved/published) — solo published se muestra en la web publica
 - `recurring` (boolean), `recurring_day` (text: sunday/wednesday/etc)
@@ -596,7 +598,9 @@ No se pierden datos: la pausa no borra nada.
 | **Vercel Cron** diario a un endpoint que consulte la DB | Gratis | Buena, pero hay que crear el endpoint (ver abajo) |
 | Entrar al hub una vez por semana | Gratis | Fragil — depende de acordarse |
 
-**El cron todavia NO existe.** Para implementarlo hace falta: crear `vercel.json` con un `crons` diario, agregar una ruta que haga un `select` real contra Postgres (protegida con `CRON_SECRET`, que ya esta en las env vars pero **sin usos en el codigo**), y deployar. En Hobby, Vercel permite hasta 2 cron jobs con frecuencia diaria — alcanza de sobra.
+**Cron implementado (2026-10-22)**: `vercel.json` corre `/api/cron/keepalive` todos los dias a las 20:00 UTC; la ruta hace un `count` real sobre `songs` y exige `Authorization: Bearer $CRON_SECRET` (Vercel lo manda solo; `CRON_SECRET` cargado en Production). Si la DB se vuelve a pausar, revisar los logs del cron en Vercel.
+
+**Limite de 2 proyectos Free activos por cuenta**: para restaurar jec-hub el 2026-10-22 hubo que **pausar `kleanzyhub`** (heavensglow-v2 sigue activo). Restaurar via API funciona: `POST /v1/projects/{ref}/restore` (y `/pause`) — devuelve 403 si se supera el limite.
 
 ### Chequeo rapido de estado
 ```powershell
@@ -714,7 +718,7 @@ JEC Hub evolucionara a **JEC Platform** — plataforma centralizada de la iglesi
 - [x] 14 scripts de scraping/categorization/cleanup en `scripts/`
 
 ### Fase 2: Pendiente — Mejoras iglesia
-- [ ] **EVITAR QUE LA DB SE PAUSE**: el plan Free pausa el proyecto tras ~7 dias sin actividad de DB y ya tumbo el hub una vez (48 dias caido). Decidir entre upgrade a Pro (USD 25/mes) o Vercel Cron diario + endpoint que consulte Postgres. Ver "Mantenimiento de la Base de Datos"
+- [x] **EVITAR QUE LA DB SE PAUSE** (cron keepalive diario, 2026-10-22): el plan Free pausa el proyecto tras ~7 dias sin actividad de DB y ya tumbo el hub una vez (48 dias caido). Decidir entre upgrade a Pro (USD 25/mes) o Vercel Cron diario + endpoint que consulte Postgres. Ver "Mantenimiento de la Base de Datos"
 - [ ] **AUDITORIA DE IMAGENES REPETIDAS**: Revisar TODAS las paginas y verificar que ninguna imagen se repita entre paginas o secciones. Actualmente `worship.jpg` aun se usa en nosotros (mision) y ministerios ("One Body"). Usar fotos unicas de Pexels para cada seccion. Comando para auditar: `grep -rn "iglesia/" src/app/iglesia/ | grep -E "\.(jpg|png|jpeg)" | sort`
 - [x] Sermones: YouTube embeds reales + Spotify podcasts + paginas individuales con notas
 - [ ] Testimonios: conectar a datos reales (actualmente placeholders estaticos)

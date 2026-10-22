@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { title, description, event_date, end_date, start_time, end_time, location, event_type, status, recurring, recurring_day } = body;
+  const { title, description, event_date, end_date, start_time, end_time, location, registration_url, event_type, status, recurring, recurring_day } = body;
 
   if (!title || !event_date) {
     return NextResponse.json({ error: "Título y fecha son requeridos" }, { status: 400 });
@@ -90,6 +90,7 @@ export async function POST(request: NextRequest) {
       start_time: start_time || null,
       end_time: end_time || null,
       location: location || "73 Nollamara Ave, Nollamara WA 6061",
+      registration_url: registration_url || null,
       event_type: event_type || "service",
       status: status || "draft",
       recurring: recurring || false,

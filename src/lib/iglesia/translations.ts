@@ -232,6 +232,8 @@ export const translations = {
     eventsMonths: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
     eventsDays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
     eventsToday: "Today",
+    eventsRegister: "Register",
+    eventsRegistrationOpen: "Registrations Open",
     // About page
     aboutLabel: "Our Story",
     aboutTitle: "About Us",
@@ -611,6 +613,8 @@ export const translations = {
     eventsMonths: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
     eventsDays: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"],
     eventsToday: "Hoy",
+    eventsRegister: "Inscribirse",
+    eventsRegistrationOpen: "Inscripciones Abiertas",
     aboutLabel: "Nuestra Historia",
     aboutTitle: "Nosotros",
     aboutHeroDesc: "Conoce nuestra iglesia, nuestra visión y quienes nos lideran.",

@@ -92,6 +92,7 @@ export interface ChurchEvent {
   start_time: string | null;
   end_time: string | null;
   location: string | null;
+  registration_url: string | null; // link de inscripcion (ej. Google Form)
   event_type: EventType;
   status: EventStatus;
   recurring: boolean;

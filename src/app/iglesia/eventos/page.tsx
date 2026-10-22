@@ -30,6 +30,7 @@ export default function EventosPage() {
   const { lang } = useLang();
   const l = translations[lang];
   const [events, setEvents] = useState<ChurchEvent[]>([]);
+  const [openRegistrations, setOpenRegistrations] = useState<ChurchEvent[]>([]);
   const [eventsMonth, setEventsMonth] = useState(() => {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() };
@@ -48,6 +49,32 @@ export default function EventosPage() {
   useEffect(() => {
     fetchEvents();
   }, [fetchEvents]);
+
+  // Eventos proximos (12 meses) con link de inscripcion: se destacan arriba
+  // del calendario sin importar el mes que se este viendo.
+  useEffect(() => {
+    const fmt = (d: Date) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const now = new Date();
+    const until = new Date(now);
+    until.setFullYear(until.getFullYear() + 1);
+    fetch(`/api/events?from=${fmt(now)}&to=${fmt(until)}`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) =>
+        setOpenRegistrations(
+          Array.isArray(data) ? data.filter((e: ChurchEvent) => e.registration_url) : []
+        )
+      )
+      .catch(() => setOpenRegistrations([]));
+  }, []);
+
+  const formatRange = (ev: ChurchEvent) => {
+    const start = new Date(ev.event_date + "T12:00:00");
+    const startStr = `${start.getDate()} ${l.eventsMonths[start.getMonth()]}`;
+    if (!ev.end_date || ev.end_date === ev.event_date) return `${startStr} ${start.getFullYear()}`;
+    const end = new Date(ev.end_date + "T12:00:00");
+    return `${startStr} – ${end.getDate()} ${l.eventsMonths[end.getMonth()]} ${end.getFullYear()}`;
+  };
 
   const prevMonth = () =>
     setEventsMonth((m) =>
@@ -126,6 +153,42 @@ export default function EventosPage() {
               {l.eventsHeroDesc}
             </p>
           </FadeIn>
+
+          {openRegistrations.length > 0 && (
+            <FadeIn className="max-w-4xl mx-auto mb-12 space-y-4">
+              {openRegistrations.map((ev) => (
+                <div
+                  key={ev.id}
+                  className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 bg-[#4A3F35] text-white p-6 sm:p-8 rounded-xl shadow-lg"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[#C9A86C] text-xs font-semibold uppercase tracking-[0.2em] mb-2">
+                      {l.eventsRegistrationOpen}
+                    </p>
+                    <h3 className="text-xl sm:text-2xl" style={serif}>
+                      {ev.title}
+                    </h3>
+                    <p className="flex items-center gap-1.5 text-sm text-white/80 mt-2">
+                      <Calendar className="w-4 h-4 text-[#C9A86C]" />
+                      {formatRange(ev)}
+                    </p>
+                    {ev.description && (
+                      <p className="text-sm text-white/70 mt-2">{ev.description}</p>
+                    )}
+                  </div>
+                  <a
+                    href={ev.registration_url!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 self-start sm:self-center flex-shrink-0 bg-[#C9A86C] hover:bg-[#B8956A] text-white text-sm font-semibold px-6 py-3 rounded-full transition-colors"
+                  >
+                    {l.eventsRegister}
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                </div>
+              ))}
+            </FadeIn>
+          )}
 
           <FadeIn>
             <div className="max-w-4xl mx-auto">
@@ -279,6 +342,17 @@ export default function EventosPage() {
                             <p className="text-sm text-[#6B5D4D]/80 mt-2 line-clamp-2">
                               {ev.description}
                             </p>
+                          )}
+                          {ev.registration_url && (
+                            <a
+                              href={ev.registration_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 mt-3 bg-[#C9A86C] hover:bg-[#B8956A] text-white text-xs font-semibold px-4 py-2 rounded-full transition-colors"
+                            >
+                              {l.eventsRegister}
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
                           )}
                         </div>
 
