@@ -564,26 +564,31 @@ Permisos:
 - Diseno split-screen con imagen de adoracion
 - Responsive (stacked en mobile, side-by-side en desktop)
 
-## Estado de la Sesion (2026-07-29) — Para Retomar
+## Estado de la Sesion (2026-10-22) — Para Retomar
 
-- **Todo pusheado y deployado**: master en `17ad3dc`, sincronizado con GitHub y en produccion. La red corporativa que bloqueaba github.com y api.vercel.com el 2026-06-11 **ya no bloquea nada**
-- **DB restaurada y activa**: el proyecto estuvo pausado 48 dias por inactividad (ver "Mantenimiento de la Base de Datos"). Restaurado el 2026-07-29, 20 MB, 8.743 canciones intactas
+- **Todo pusheado y deployado**: master sincronizado con GitHub y en produccion (ultimo commit de codigo: favicon `08ccceb`)
+- **DB activa otra vez**: estaba pausada de nuevo. Para restaurarla hubo que **pausar `kleanzyhub`** (limite de 2 proyectos Free activos por cuenta). Ahora hay **cron keepalive diario** (`/api/cron/keepalive`, ver "Mantenimiento de la Base de Datos"). **Verificar en la proxima sesion que el cron haya corrido** (Vercel → Logs / Cron Jobs) y que la DB siga `ACTIVE_HEALTHY`
+- **Hecho el 2026-10-22** (pedido de Michelle/Raquel):
+  - Columna `church_events.registration_url` (migracion `20261022000000_event_registration_url.sql`, aplicada) + campo en el form admin + boton "Inscribirse" y banner "Inscripciones Abiertas" en `/iglesia/eventos`
+  - Eventos cargados (`scripts/seed-oct-2026-events.sql`): Anniversary Picnic (sab 24/10 1pm, Kings Park) y Anniversary Celebration (dom 25/10 3pm). Al "Campamento 2027" (5-7/02/2027, ya existia) se le agrego el link `https://forms.gle/ifRKhL3WHLED6jKN9` (inscripcion cierra 11/01/2027)
+  - Favicon: version simplificada del logo (anillo azul + cruz dorada) en `src/app/favicon.ico`, `icon.png`, `apple-icon.png`
+- **Pendiente con contenido**: el campamento no tiene ubicacion cargada (preguntar a Michelle/Raquel). Despues del 25/10 se pueden despublicar los eventos del aniversario si se quiere; despues del 11/01/2027 sacar el `registration_url` del campamento para que desaparezca el banner
 - **OJO**: el CLI de Supabase local sigue linkeado a heavensglow-v2 (`supabase/.temp/project-ref` = `hkukiapttwkqrhylogig`), NO usar `supabase db push` sin re-linkear a `avowxrzsqgetktqrefxa`
 - **Truco PowerShell 5.1 + Management API**: leer SQL con `[System.IO.File]::ReadAllText(path, UTF8)`, castear `[string]$sql.ToString()` antes de ConvertTo-Json, y enviar bytes UTF-8 con `-ContentType "application/json; charset=utf-8"`. Los acentos se ven mal en la consola de PowerShell aunque esten bien guardados — verificar con `length()`/`octet_length()`, no a ojo
-- **Branch `backup-pre-rewrite` (`a0ad386`)**: historial viejo con un PAT de Supabase y un service_role JWT del proyecto eliminado. **NO pushearlo**; borrar con `git branch -D backup-pre-rewrite` cuando ya no haga falta. El historial de master fue limpiado con `git filter-branch` porque GitHub push protection rechazaba el push
-- **Proximos pasos**: 1) asignar roles reales (hoy solo existe 1 perfil `admin`, `ministry_members` esta vacio), 2) evitar que la DB se vuelva a pausar, 3) Fase 3c (sermones/podcasts), 4) reemplazar 7 imagenes repetidas (auditoria hecha: worship.jpg x3, preaching.jpg x5, 5 fotos ministerio duplicadas homepage-preview vs hero; huerfanas reutilizables: speaker.jpg, worship-hands.jpg, sermon-1/2/4/5/6.jpg)
+- **Branch `backup-pre-rewrite` (`a0ad386`)**: historial viejo con un PAT de Supabase y un service_role JWT del proyecto eliminado. **NO pushearlo**; borrar con `git branch -D backup-pre-rewrite` cuando ya no haga falta
+- **Proximos pasos**: 1) asignar roles reales (hoy solo existe 1 perfil `admin`, `ministry_members` esta vacio), 2) Fase 3c (sermones/podcasts), 3) reemplazar 7 imagenes repetidas (auditoria hecha: worship.jpg x3, preaching.jpg x5, 5 fotos ministerio duplicadas homepage-preview vs hero; huerfanas reutilizables: speaker.jpg, worship-hands.jpg, sermon-1/2/4/5/6.jpg), 4) decidir si reactivar kleanzyhub (requiere pausar otro proyecto o pasar a Pro)
 
 ## Mantenimiento de la Base de Datos
 
 ### Por que se pausa
-El plan **Free de Supabase pausa el proyecto tras ~7 dias sin actividad de base de datos**. Ya paso una vez: el proyecto quedo `INACTIVE` entre el 2026-06-11 y el 2026-07-29. Sintomas:
+El plan **Free de Supabase pausa el proyecto tras ~7 dias sin actividad de base de datos**. Ya paso dos veces: `INACTIVE` entre el 2026-06-11 y el 2026-07-29, y otra vez hasta el 2026-10-22. Sintomas:
 - La Management API devuelve **544** en cualquier query
 - El hub (login, canciones, programas, eventos, CMS) queda caido
 - **La pagina de iglesia sigue devolviendo 200** porque es casi toda estatica — por eso la caida pasa desapercibida
 
 Ojo: **el trafico web NO cuenta como actividad si no toca la DB**. `/api/health` solo lee variables de entorno, no consulta Postgres, asi que pinguearlo no evita la pausa.
 
-### Como restaurarlo (solo desde el dashboard, no hay API)
+### Como restaurarlo (dashboard o API `POST /v1/projects/{ref}/restore`)
 1. Ir a `https://supabase.com/dashboard/project/avowxrzsqgetktqrefxa`
 2. Boton **"Restore project"** y confirmar el dialogo
 3. Esperar. Pasa por el estado `COMING_UP`; mientras tanto la Management API devuelve **400 Bad Request** (no 544). Si aparece un 400 raro, **reintentar antes de diagnosticar el SQL**
@@ -708,6 +713,8 @@ JEC Hub evolucionara a **JEC Platform** — plataforma centralizada de la iglesi
 - [x] Nav completo: 7 links + boton Give/Donar con Heart icon
 - [x] Paginas individuales por ministerio (hombres, mujeres, jovenes, ninos, adoracion) con intro, features, lider, CTA
 - [x] Reemplazo de imagenes repetidas en homepage, contacto y eventos con stock photos unicos
+- [x] Eventos con link de inscripcion (`registration_url`) + banner "Inscripciones Abiertas"
+- [x] Favicon con el logo de la iglesia
 - [x] Pagina En Vivo (`/iglesia/en-vivo`) con YouTube live embed (Channel ID) + horarios + CTA subscribe
 - [x] Navegacion por artista y categoria en biblioteca de canciones
 - [x] APIs de artistas y categorias (`/api/songs/artists`, `/api/songs/categories`)
